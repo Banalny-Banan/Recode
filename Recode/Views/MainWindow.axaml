@@ -10,24 +10,7 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Recode"
-        RequestedThemeVariant="Dark">
-
-  <Window.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFF3F3F3" />
-          <SolidColorBrush x:Key="AppBorderBrush" Color="#FFD0D0D0" />
-          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99000000" />
-        </ResourceDictionary>
-        <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF191a1c" />
-          <SolidColorBrush x:Key="AppBorderBrush" Color="#FF555555" />
-          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99FFFFFF" />
-        </ResourceDictionary>
-      </ResourceDictionary.ThemeDictionaries>
-    </ResourceDictionary>
-  </Window.Resources>
+        RequestedThemeVariant="Light">
 
   <Window.Background>
     <DynamicResourceExtension ResourceKey="AppBackgroundBrush" />
