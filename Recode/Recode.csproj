@@ -24,4 +24,9 @@
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Recode.Core\Recode.Core.csproj" />
+      <ProjectReference Include="..\Recode.Infrastructure\Recode.Infrastructure.csproj" />
+    </ItemGroup>
 </Project>
