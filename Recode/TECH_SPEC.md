@@ -313,57 +313,7 @@ Separate modal window:
 
 ## 6. Data Models
 
-### 6.1 Core Models
-
-```csharp
-public record CompressionJob
-{
-    public required string InputPath { get; init; }
-    public string? OutputPath { get; init; }       // null when OutputMode is Replace
-    public OutputMode OutputMode { get; init; }
-    public CodecType Codec { get; init; }
-    public int Quality { get; init; }              // 0-100 (mapped to CRF per codec)
-    public SpeedPreset Speed { get; init; }
-    public AudioOption Audio { get; init; }
-    public JobStatus Status { get; set; }
-    public double Progress { get; set; }           // 0.0 - 1.0
-    public TimeSpan Elapsed { get; set; }
-    public TimeSpan? EstimatedRemaining { get; set; }
-    public long InputSize { get; set; }
-    public long? OutputSize { get; set; }
-}
-
-public enum CodecType { H264, H265, VP9, AV1 }
-public enum SpeedPreset { Ultrafast, Fast, Medium, Slow }
-public enum AudioOption { Copy, Aac128, Aac256, Strip }
-public enum OutputMode { Replace, OutputToFolder }
-public enum PostAction { None, Sleep, Shutdown, OpenFolder, PlaySound }
-public enum JobStatus { Pending, Encoding, Paused, Done, Failed, Cancelled }
-```
-
-### 6.2 Settings Model
-
-```csharp
-public sealed class AppSettings
-{
-    public int SchemaVersion { get; set; } = 1;
-    public ThemeOption Theme { get; set; } = ThemeOption.System;
-    public string? FfmpegPath { get; set; }             // null = auto-detect
-
-    public CompressionDefaults Compression { get; set; } = new();
-}
-
-public sealed class CompressionDefaults
-{
-    public CodecType Codec { get; set; } = CodecType.H265;
-    public int Quality { get; set; } = 50;
-    public SpeedPreset Speed { get; set; } = SpeedPreset.Medium;
-    public AudioOption Audio { get; set; } = AudioOption.Copy;
-    public OutputMode OutputMode { get; set; } = OutputMode.Replace;
-    public string OutputDirectory { get; set; } = "";    // empty = default (Videos\Recode\)
-    public PostAction PostAction { get; set; } = PostAction.None;
-}
-```
+Models and enums will be created as needed during development.
 
 ---
 
