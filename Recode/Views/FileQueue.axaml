@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Recode.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="92"
+             x:Class="Recode.Views.FileQueue"
+             x:DataType="vm:MainWindowViewModel">
+
+  <DockPanel>
+
+    <!-- Overall progress bar: flat top corners, rounded bottom corners — flush under the queue -->
+    <ProgressBar DockPanel.Dock="Bottom" Value="30" Maximum="100"
+                 MinHeight="6" CornerRadius="0,0,4,4" />
+
+    <!-- File queue: rounded top, flat bottom -->
+    <Border BorderBrush="{DynamicResource AppBorderBrush}"
+            BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="4">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding QueueItems}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:QueueItemViewModel">
+              <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="8,4">
+                <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Text="{Binding FileSize}" VerticalAlignment="Center" Margin="16,0" />
+                <ProgressBar Grid.Column="2" Value="{Binding Progress}" Maximum="100" Width="120"
+                             VerticalAlignment="Center" Margin="0,0,16,0" />
+                <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" />
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+  </DockPanel>
+
+</UserControl>

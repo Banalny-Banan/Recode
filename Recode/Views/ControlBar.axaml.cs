@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Recode.Views;
 
-public partial class DropZone : UserControl
+public partial class ControlBar : UserControl
 {
-    public DropZone()
+    public ControlBar()
     {
         InitializeComponent();
     }

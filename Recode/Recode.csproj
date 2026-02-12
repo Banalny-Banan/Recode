@@ -34,4 +34,10 @@
       <ProjectReference Include="..\Recode.Core\Recode.Core.csproj" />
       <ProjectReference Include="..\Recode.Infrastructure\Recode.Infrastructure.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Controls\EnumSelector.axaml.cs">
+        <DependentUpon>EnumSelector.axaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
 </Project>

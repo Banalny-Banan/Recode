@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Recode.ViewModels"
+             xmlns:controls="clr-namespace:Recode.Controls"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="32"
+             x:Class="Recode.Views.ControlBar"
+             x:DataType="vm:MainWindowViewModel">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <Grid ColumnDefinitions="*,Auto">
+
+    <!-- Left side: post-completion action -->
+    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+      <TextBlock Text="After completion:" VerticalAlignment="Center" />
+      <controls:EnumSelector SelectedValue="{Binding AfterCompletionAction}" Mode="Dropdown" />
+    </StackPanel>
+
+    <!-- Right side: cancel, start and settings button -->
+    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+      <Button Content="Cancel" IsEnabled="False" Height="32" VerticalContentAlignment="Center" />
+      <Button Content="Start" MinWidth="100" Height="32" VerticalContentAlignment="Center" />
+      <Button ToolTip.Tip="Settings" Content="&#xE713;" FontFamily="Segoe Fluent Icons"
+              Height="32" FontSize="16" VerticalContentAlignment="Center" />
+    </StackPanel>
+
+  </Grid>
+
+</UserControl>

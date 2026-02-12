@@ -3,139 +3,45 @@
         xmlns:vm="using:Recode.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="370"
-        Width="600" Height="370" MinWidth="600" MinHeight="370"
+        xmlns:views="clr-namespace:Recode.Views"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="375"
+        Width="600" Height="370" MinWidth="600" MinHeight="375"
         x:Class="Recode.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Recode">
+        Title="Recode"
+        RequestedThemeVariant="Dark">
 
   <Window.Resources>
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF3F3F3" />
+          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFF3F3F3" />
+          <SolidColorBrush x:Key="AppBorderBrush" Color="#FFD0D0D0" />
+          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99000000" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FF191a1c" />
+          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF191a1c" />
+          <SolidColorBrush x:Key="AppBorderBrush" Color="#FF555555" />
+          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99FFFFFF" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
   </Window.Resources>
 
   <Window.Background>
-    <DynamicResourceExtension ResourceKey="WindowBackgroundBrush" />
+    <DynamicResourceExtension ResourceKey="AppBackgroundBrush" />
   </Window.Background>
 
   <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainWindowViewModel />
   </Design.DataContext>
 
-  <!-- DockPanel fills the window; children dock to edges, last child fills remaining space -->
-  <DockPanel Margin="16">
-
-    <!-- ==================== DROP ZONE ==================== -->
-    <views:DropZone DockPanel.Dock="Top" />                                                                                                                                                                
-    <!-- ==================== COMPRESSION CONTROLS ==================== -->
-    <StackPanel DockPanel.Dock="Top">
-
-      <!-- Codec selector: row of radio buttons acting as a segmented control -->
-      <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="Codec:" VerticalAlignment="Center" Width="60" />
-        <ListBox SelectionMode="Single" SelectedIndex="0" Background="Transparent">
-          <ListBox.Styles>
-            <Style Selector="ListBoxItem">
-              <Setter Property="CornerRadius" Value="4" />
-              <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-              <Setter Property="BorderThickness" Value="1" />
-              <Setter Property="Padding" Value="12,4" />
-              <Setter Property="Margin" Value="0,0,4,0" />
-            </Style>
-          </ListBox.Styles>
-          <ListBox.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Orientation="Horizontal" Spacing="0" />
-            </ItemsPanelTemplate>
-          </ListBox.ItemsPanel>
-          <ListBoxItem Content="H.264" />
-          <ListBoxItem Content="H.265" />
-          <ListBoxItem Content="VP9" />
-          <ListBoxItem Content="AV1" />
-        </ListBox>
-
-
-      </StackPanel>
-
-      <!-- Quality slider -->
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="Quality:" VerticalAlignment="Center" Width="60" />
-        <Slider Minimum="0" Maximum="100" Value="{Binding QualityValue}"
-                Width="300" VerticalAlignment="Center" />
-        <TextBlock Text="Balanced" VerticalAlignment="Center" Opacity="0.6" />
-      </StackPanel>
-
-
-    </StackPanel>
-
-    <!-- ==================== BOTTOM BAR ==================== -->
-    <!-- DockPanel.Dock="Bottom" so it sticks to the bottom, queue fills the middle -->
-    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-      <!-- Left side: post-completion action -->
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-        <TextBlock Text="After completion:" VerticalAlignment="Center" />
-        <ComboBox SelectedIndex="0" Width="160">
-          <ComboBoxItem Content="Do nothing" />
-          <ComboBoxItem Content="Sleep" />
-          <ComboBoxItem Content="Shutdown" />
-          <ComboBoxItem Content="Open output folder" />
-          <ComboBoxItem Content="Play sound" />
-        </ComboBox>
-      </StackPanel>
-      <!-- Right side: cancel, start and settings button -->
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-        <Button Content="Cancel" IsEnabled="False" Height="32" VerticalContentAlignment="Center" />
-        <Button Content="Start" MinWidth="100" Height="32" VerticalContentAlignment="Center" />
-        <Button ToolTip.Tip="Settings" Content="&#xE713;" FontFamily="Segoe Fluent Icons"
-                Height="32" FontSize="16" VerticalContentAlignment="Center" />
-      </StackPanel>
-    </Grid>
-
-    <!-- ==================== FILE QUEUE + PROGRESS (combined) ==================== -->
-    <!-- This is the last child in the DockPanel, so it fills all remaining space -->
-    <DockPanel>
-      <!-- Overall progress bar: flat top corners, rounded bottom corners — flush under the queue -->
-      <ProgressBar DockPanel.Dock="Bottom" Value="30" Maximum="100"
-                   MinHeight="6" CornerRadius="0,0,4,4" />
-
-      <!-- File queue: rounded top, flat bottom -->
-      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-              BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="4">
-        <ListBox Background="Transparent">
-          <!-- Placeholder items; will be replaced with data binding later -->
-          <ListBoxItem>
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-              <TextBlock Grid.Column="0" Text="video1.mp4" VerticalAlignment="Center" />
-              <TextBlock Grid.Column="1" Text="1.2 GB" VerticalAlignment="Center" Margin="16,0" />
-              <ProgressBar Grid.Column="2" Value="60" Maximum="100" Width="120"
-                           VerticalAlignment="Center" Margin="0,0,16,0" />
-              <TextBlock Grid.Column="3" Text="ETA 2:30" VerticalAlignment="Center" />
-            </Grid>
-          </ListBoxItem>
-          <ListBoxItem>
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-              <TextBlock Grid.Column="0" Text="video2.mkv" VerticalAlignment="Center" />
-              <TextBlock Grid.Column="1" Text="800 MB" VerticalAlignment="Center" Margin="16,0" />
-              <ProgressBar Grid.Column="2" Value="0" Maximum="100" Width="120"
-                           VerticalAlignment="Center" Margin="0,0,16,0" />
-              <TextBlock Grid.Column="3" Text="Pending" VerticalAlignment="Center" />
-            </Grid>
-          </ListBoxItem>
-        </ListBox>
-      </Border>
-    </DockPanel>
-
-  </DockPanel>
+  <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="16">
+    <views:FileDropZone Grid.Row="0" Margin="0,0,0,16" />
+    <views:CompressionControls Grid.Row="1" />
+    <views:FileQueue Grid.Row="2" />
+    <views:ControlBar Grid.Row="3" Margin="0,8,0,0" />
+  </Grid>
 
 </Window>

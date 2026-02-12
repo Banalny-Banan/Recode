@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Recode.ViewModels"
+             xmlns:controls="clr-namespace:Recode.Controls"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="70"
+             x:Class="Recode.Views.CompressionControls"
+             x:DataType="vm:MainWindowViewModel">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <StackPanel>
+
+    <!-- Codec selector -->
+    <StackPanel Orientation="Horizontal" Spacing="4">
+      <TextBlock Text="Codec:" VerticalAlignment="Center" Width="60" />
+      <controls:EnumSelector SelectedValue="{Binding SelectedCodec}" Mode="List" />
+    </StackPanel>
+
+    <!-- Quality slider -->
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="Quality:" VerticalAlignment="Center" Width="60" />
+
+      <Slider Minimum="0" Maximum="100" Value="{Binding QualityValue}"
+              Width="300" VerticalAlignment="Center" />
+      <TextBlock Text="Balanced" VerticalAlignment="Center" Opacity="0.6" />
+    </StackPanel>
+
+  </StackPanel>
+</UserControl>

@@ -207,6 +207,7 @@ Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia do
 
 #### 4.3.1 General
 - **Theme**: System / Light / Dark
+- **Accent color**: Color picker to override the default Avalonia accent color
 - **FFmpeg path**: Auto-detected or manual override (folder picker)
 
 #### 4.3.2 Compression Defaults

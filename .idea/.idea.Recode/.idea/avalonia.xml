@@ -4,7 +4,12 @@
     <option name="projectPerEditor">
       <map>
         <entry key="Recode/App.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Controls/EnumSelector.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Views/CompressionControls.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Views/ControlBar.axaml" value="Recode/Recode.csproj" />
         <entry key="Recode/Views/DropZone.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Views/FileDropZone.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Views/FileQueue.axaml" value="Recode/Recode.csproj" />
         <entry key="Recode/Views/MainWindow.axaml" value="Recode/Recode.csproj" />
       </map>
     </option>

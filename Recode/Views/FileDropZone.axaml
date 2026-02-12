@@ -2,18 +2,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="Recode.Views.DropZone">
+             xmlns:vm="using:Recode.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="120"
+             x:Class="Recode.Views.FileDropZone"
+             x:DataType="vm:MainWindowViewModel">
+
   <!-- Panel layers children on top of each other; Rectangle provides the dashed border -->
-  <Panel DockPanel.Dock="Top" Margin="0,0,0,16">
-    <Rectangle Stroke="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+  <Panel DragDrop.AllowDrop="True" Background="Transparent">
+    <Rectangle Stroke="{DynamicResource AppBorderBrush}"
                StrokeThickness="2" StrokeDashArray="2,2"
                RadiusX="8" RadiusY="8" />
     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                 Spacing="8" Margin="24">
       <TextBlock Text="Drag &amp; drop video files here"
                  HorizontalAlignment="Center" Opacity="0.6" />
-      <Button Content="Browse Files" HorizontalAlignment="Center" />
+      <Button Content="Browse Files" HorizontalAlignment="Center" Click="BrowseButton_OnClick"/>
     </StackPanel>
   </Panel>
+
 </UserControl>
