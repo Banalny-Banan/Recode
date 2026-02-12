@@ -14,19 +14,19 @@
           <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFFFF" />
 
           <!-- Accent -->
-          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF0078D4" />
-          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF006CBE" />
-          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF0060A8" />
-          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#660078D4" />
+          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF005FB8" />
+          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF1971C2" />
+          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF004E99" />
+          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#55005FB8" />
 
           <!-- Text -->
-          <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FF000000" />
-          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99000000" />
-          <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#44000000" />
+          <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FF1A1A1A" />
+          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#FF656565" />
+          <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#FF9E9E9E" />
           <SolidColorBrush x:Key="AppTextOnAccentBrush" Color="#FFFFFFFF" />
 
           <!-- Border -->
-          <SolidColorBrush x:Key="AppBorderBrush" Color="#ADADAD" />
+          <SolidColorBrush x:Key="AppBorderBrush" Color="#FFD6D6D6" />
 
           <!-- Status -->
           <SolidColorBrush x:Key="AppErrorBrush" Color="#FFC42B1C" />
@@ -35,28 +35,28 @@
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <!-- Background -->
-          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF191a1c" />
-          <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FF2b2b2b" />
+          <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF1C1C1E" />
+          <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FF2A2A2C" />
 
           <!-- Accent -->
-          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF60CDFF" />
-          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF4DB8E8" />
-          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF3AA3D2" />
-          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#6660CDFF" />
+          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF4CC2FF" />
+          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF5ECAFF" />
+          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF38B4F0" />
+          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#554CC2FF" />
 
           <!-- Text -->
-          <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FFFFFFFF" />
-          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#99FFFFFF" />
-          <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#44FFFFFF" />
+          <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FFE4E4E4" />
+          <SolidColorBrush x:Key="AppTextSecondaryBrush" Color="#FF9D9D9D" />
+          <SolidColorBrush x:Key="AppTextDisabledBrush" Color="#FF5C5C5C" />
           <SolidColorBrush x:Key="AppTextOnAccentBrush" Color="#FF000000" />
 
           <!-- Border -->
-          <SolidColorBrush x:Key="AppBorderBrush" Color="#FF555555" />
+          <SolidColorBrush x:Key="AppBorderBrush" Color="#FF3D3D3D" />
 
           <!-- Status -->
-          <SolidColorBrush x:Key="AppErrorBrush" Color="#FFFF99A4" />
-          <SolidColorBrush x:Key="AppSuccessBrush" Color="#FF6CCB5F" />
-          <SolidColorBrush x:Key="AppWarningBrush" Color="#FFFCE100" />
+          <SolidColorBrush x:Key="AppErrorBrush" Color="#FFFF6B68" />
+          <SolidColorBrush x:Key="AppSuccessBrush" Color="#FF4EC96B" />
+          <SolidColorBrush x:Key="AppWarningBrush" Color="#FFFFB848" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>

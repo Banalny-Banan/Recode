@@ -10,7 +10,7 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Recode"
-        RequestedThemeVariant="Light">
+        RequestedThemeVariant="Dark">
 
   <Window.Background>
     <DynamicResourceExtension ResourceKey="AppBackgroundBrush" />
