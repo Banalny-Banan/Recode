@@ -4,6 +4,7 @@
     <option name="projectPerEditor">
       <map>
         <entry key="Recode/App.axaml" value="Recode/Recode.csproj" />
+        <entry key="Recode/Views/DropZone.axaml" value="Recode/Recode.csproj" />
         <entry key="Recode/Views/MainWindow.axaml" value="Recode/Recode.csproj" />
       </map>
     </option>

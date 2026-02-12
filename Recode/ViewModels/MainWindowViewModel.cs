@@ -1,6 +1,9 @@
-﻿namespace Recode.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace Recode.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    public string Greeting { get; } = "Welcome to Avalonia!";
+    [ObservableProperty]
+    int _qualityValue = 50;
 }
