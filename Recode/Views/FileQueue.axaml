@@ -9,14 +9,18 @@
 
   <DockPanel>
 
-    <!-- Overall progress bar: flat top corners, rounded bottom corners — flush under the queue -->
-    <ProgressBar DockPanel.Dock="Bottom" Value="30" Maximum="100"
-                 MinHeight="6" CornerRadius="0,0,4,4" />
+    <ProgressBar DockPanel.Dock="Bottom" Value="{Binding OverallProgress}" Maximum="100" MinHeight="6" CornerRadius="0,0,4,4" />
 
-    <!-- File queue: rounded top, flat bottom -->
     <Border BorderBrush="{DynamicResource AppBorderBrush}"
-            BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="4">
+            Background="{DynamicResource AppInsetBrush}"
+            BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="0">
       <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer.Styles>
+          <Style Selector="RepeatButton">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+        </ScrollViewer.Styles>
+
         <ItemsControl ItemsSource="{Binding QueueItems}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:QueueItemViewModel">
@@ -30,6 +34,7 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+
       </ScrollViewer>
     </Border>
 

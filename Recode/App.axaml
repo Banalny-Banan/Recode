@@ -12,12 +12,7 @@
           <!-- Background -->
           <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FFF3F3F3" />
           <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FFFFFFFF" />
-
-          <!-- Accent -->
-          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF005FB8" />
-          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF1971C2" />
-          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF004E99" />
-          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#55005FB8" />
+          <SolidColorBrush x:Key="AppInsetBrush" Color="#FFEBEBEB" />
 
           <!-- Text -->
           <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FF1A1A1A" />
@@ -37,12 +32,7 @@
           <!-- Background -->
           <SolidColorBrush x:Key="AppBackgroundBrush" Color="#FF1C1C1E" />
           <SolidColorBrush x:Key="AppSurfaceBrush" Color="#FF2A2A2C" />
-
-          <!-- Accent -->
-          <SolidColorBrush x:Key="AppAccentBrush" Color="#FF4CC2FF" />
-          <SolidColorBrush x:Key="AppAccentHoverBrush" Color="#FF5ECAFF" />
-          <SolidColorBrush x:Key="AppAccentPressedBrush" Color="#FF38B4F0" />
-          <SolidColorBrush x:Key="AppAccentDisabledBrush" Color="#554CC2FF" />
+          <SolidColorBrush x:Key="AppInsetBrush" Color="#FF1A1A1C" />
 
           <!-- Text -->
           <SolidColorBrush x:Key="AppTextPrimaryBrush" Color="#FFE4E4E4" />
@@ -67,6 +57,11 @@
   </Application.DataTemplates>
 
   <Application.Styles>
-    <FluentTheme />
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Light" Accent="#FF005FB8" />
+        <ColorPaletteResources x:Key="Dark" Accent="#FF4CC2FF" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
   </Application.Styles>
 </Application>

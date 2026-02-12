@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,6 +18,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty]
     AfterCompletionAction _afterCompletionAction = AfterCompletionAction.Nothing;
+
+    public double OverallProgress => QueueItems.Count == 0 ? 0 : QueueItems.Average(item => item.Progress);
 
     public ObservableCollection<QueueItemViewModel> QueueItems { get; } = [];
 
