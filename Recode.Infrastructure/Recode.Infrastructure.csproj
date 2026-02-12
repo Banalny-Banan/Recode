@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Recode.Core\Recode.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CliWrap" Version="3.10.0" />
+    </ItemGroup>
+
 </Project>
