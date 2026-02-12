@@ -42,7 +42,7 @@ Recode.sln
 **Recode.Core** (class library, no UI or platform dependencies)
 - Domain models (`CompressionJob`, `CompressionSettings`)
 - Service interfaces (`ICompressionService`, `IFfmpegManager`, `ISettingsService`)
-- Enums (`CodecType`, `SpeedPreset`, `OutputMode`, `PostAction`)
+- Enums (`CodecType`, `PostAction`)
 - Progress reporting contracts
 
 **Recode.Infrastructure** (class library, platform-specific implementations)
@@ -108,16 +108,15 @@ Two modes, toggled via a control on the compression page:
 
 #### 4.1.4 Compression Controls
 - **Quality slider**: Labeled scale from "Visually Lossless" to "Smallest File", mapped to codec-specific CRF ranges
-- **Preset selector**: Ultrafast / Fast / Medium / Slow (encoding speed vs compression ratio)
-- **Audio options**: Copy original / Re-encode AAC 128k / Re-encode AAC 256k / Strip audio
-- **Output mode**: Replace original / Output to folder (see 4.1.3)
-- **Output directory**: Folder picker, only visible when output mode is "Output to folder"
+- **Replace original**: Configured in Settings (see 4.3.2). When on, replaces source files (see 4.1.3). When off, outputs to folder.
 
 #### 4.1.5 Compression Queue & Progress
 - File queue displayed as a list with per-file status (Pending / Encoding / Done / Failed)
 - Per-file progress bar with percentage, elapsed time, and ETA
 - Overall progress bar showing files completed / total
 - Estimated output file size (based on current bitrate)
+- **Start / Queue button**: Shows "Start" when idle. Changes to "Queue" while compression is running — adding new files appends them to the end of the queue
+- **Reorder**: Pending items in the queue can be reordered via drag-and-drop (the currently encoding file cannot be moved)
 - **Cancel**: Stop current file with option to skip or abort entire queue
 - **Pause/Resume**: Suspend FFmpeg process
 
@@ -213,10 +212,8 @@ Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia do
 #### 4.3.2 Compression Defaults
 - Default codec
 - Default quality level
-- Default speed preset
-- Default audio option
-- Default output mode (replace / output to folder)
-- Default output directory (for "output to folder" mode)
+- Replace original (on/off)
+- Output directory (for when replace is off)
 - Default post-action
 
 #### 4.3.3 Storage
@@ -249,8 +246,6 @@ Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia do
 |                                                               |
 |  Codec:    [H.264] [H.265] [VP9] [AV1]   (segmented control) |
 |  Quality:  [====O==========================] Balanced          |
-|  Speed:    [Fast v]       Audio: [Copy Original v]             |
-|  Output:   (o) Replace original  ( ) Output to folder [...]   |
 |                                                               |
 |  Queue:                                                        |
 |  +-----------------------------------------------------------+
@@ -260,7 +255,7 @@ Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia do
 |  +-----------------------------------------------------------+
 |  Overall: 1/3 files  [||||||33%]        [Pause] [Cancel]      |
 |                                                               |
-|  After completion: [Do nothing v]                    [Start]   |
+|  After completion: [Do nothing v]  [x] Replace  [Start] [gear] |
 +---------------------------------------------------------------+
 ```
 
@@ -282,9 +277,7 @@ Separate modal window:
 |  +-------------------------------------------------------+ |
 |  | Default codec                  [H.265 v]              | |
 |  | Default quality                [====O========]         | |
-|  | Default speed                  [Medium v]              | |
-|  | Default audio                  [Copy Original v]       | |
-|  | Default output mode            [Replace original v]    | |
+|  | Replace original               [x]                    | |
 |  | Default output directory       C:\...\  [Browse]       | |
 |  | After completion               [Do nothing v]          | |
 |  +-------------------------------------------------------+ |

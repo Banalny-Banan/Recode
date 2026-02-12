@@ -3,9 +3,8 @@
         xmlns:vm="using:Recode.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
-        Width="900" Height="600"
-        MinWidth="700" MinHeight="500"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="370"
+        Width="600" Height="370" MinWidth="600" MinHeight="370"
         x:Class="Recode.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
@@ -18,7 +17,7 @@
           <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF3F3F3" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FF202020" />
+          <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FF191a1c" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
     </ResourceDictionary>
@@ -38,75 +37,42 @@
   <DockPanel Margin="16">
 
     <!-- ==================== DROP ZONE ==================== -->
-    <!-- Border creates the dashed-outline box; DragDrop will be wired later -->
-    <Border DockPanel.Dock="Top"
-            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
-            CornerRadius="8" Padding="24" Margin="0,0,0,16"
-            Background="Transparent">
-      <StackPanel HorizontalAlignment="Center" Spacing="8">
+    <!-- Panel layers children on top of each other; Rectangle provides the dashed border -->
+    <Panel DockPanel.Dock="Top" Margin="0,0,0,16">
+      <Rectangle Stroke="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                 StrokeThickness="2" StrokeDashArray="2,2"
+                 RadiusX="8" RadiusY="8" />
+      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Spacing="8" Margin="24">
         <TextBlock Text="Drag &amp; drop video files here"
                    HorizontalAlignment="Center" Opacity="0.6" />
         <Button Content="Browse Files" HorizontalAlignment="Center" />
       </StackPanel>
-    </Border>
+    </Panel>
 
     <!-- ==================== COMPRESSION CONTROLS ==================== -->
     <StackPanel DockPanel.Dock="Top" Spacing="12" Margin="0,0,0,16">
 
-      <!-- Codec selector: row of radio buttons acting as a segmented control -->
-      <StackPanel Orientation="Horizontal" Spacing="4">
-        <TextBlock Text="Codec:" VerticalAlignment="Center" Width="60" />
-        <RadioButton Content="H.264" GroupName="Codec" IsChecked="True" />
-        <RadioButton Content="H.265" GroupName="Codec" />
-        <RadioButton Content="VP9" GroupName="Codec" />
-        <RadioButton Content="AV1" GroupName="Codec" />
-      </StackPanel>
+
+      <Grid ColumnDefinitions="Auto,Auto">
+        <!-- Codec selector: row of radio buttons acting as a segmented control -->
+        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,0,0,-4">
+          <TextBlock Text="Codec:" VerticalAlignment="Center" Width="60" />
+          <RadioButton Content="H.264" GroupName="Codec" IsChecked="True" />
+          <RadioButton Content="H.265" GroupName="Codec" />
+          <RadioButton Content="VP9" GroupName="Codec" />
+          <RadioButton Content="AV1" GroupName="Codec" />
+        </StackPanel>
+      </Grid>
 
       <!-- Quality slider -->
-      <StackPanel Orientation="Horizontal" Spacing="8">
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,-8,0,-10">
         <TextBlock Text="Quality:" VerticalAlignment="Center" Width="60" />
         <Slider Minimum="0" Maximum="100" Value="50"
                 Width="300" VerticalAlignment="Center" />
         <TextBlock Text="Balanced" VerticalAlignment="Center" Opacity="0.6" />
       </StackPanel>
 
-      <!-- Speed + Audio on the same row -->
-      <StackPanel Orientation="Horizontal" Spacing="24">
-        <!-- Speed preset -->
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Speed:" VerticalAlignment="Center" Width="60" />
-          <ComboBox SelectedIndex="2" Width="140">
-            <ComboBoxItem Content="Ultrafast" />
-            <ComboBoxItem Content="Fast" />
-            <ComboBoxItem Content="Medium" />
-            <ComboBoxItem Content="Slow" />
-          </ComboBox>
-        </StackPanel>
-
-        <!-- Audio option -->
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <TextBlock Text="Audio:" VerticalAlignment="Center" />
-          <ComboBox SelectedIndex="0" Width="170">
-            <ComboBoxItem Content="Copy original" />
-            <ComboBoxItem Content="Re-encode AAC 128k" />
-            <ComboBoxItem Content="Re-encode AAC 256k" />
-            <ComboBoxItem Content="Strip audio" />
-          </ComboBox>
-        </StackPanel>
-      </StackPanel>
-
-      <!-- Output mode -->
-      <StackPanel Orientation="Horizontal" Spacing="8">
-        <TextBlock Text="Output:" VerticalAlignment="Center" Width="60" />
-        <RadioButton Content="Replace original" GroupName="OutputMode" IsChecked="True"
-                     VerticalAlignment="Center" />
-        <RadioButton Content="Output to folder" GroupName="OutputMode"
-                     VerticalAlignment="Center" />
-        <!-- Folder path + browse: only visible when "Output to folder" is selected -->
-        <TextBlock Text="C:\Videos\Recode\" VerticalAlignment="Center"
-                   Opacity="0.6" IsVisible="False" />
-        <Button Content="..." IsVisible="False" ToolTip.Tip="Choose output folder" />
-      </StackPanel>
 
     </StackPanel>
 
@@ -114,8 +80,7 @@
     <!-- DockPanel.Dock="Bottom" so it sticks to the bottom, queue fills the middle -->
     <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,8,0,0">
       <!-- Left side: post-completion action -->
-      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
-                  VerticalAlignment="Center">
+      <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
         <TextBlock Text="After completion:" VerticalAlignment="Center" />
         <ComboBox SelectedIndex="0" Width="160">
           <ComboBoxItem Content="Do nothing" />
@@ -125,48 +90,48 @@
           <ComboBoxItem Content="Play sound" />
         </ComboBox>
       </StackPanel>
-      <!-- Right side: start and settings button -->
-      <StackPanel Grid.Column="1" Orientation="Horizontal">
+      <!-- Right side: cancel, start and settings button -->
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+        <Button Content="Cancel" IsEnabled="False" Height="32" VerticalContentAlignment="Center" />
         <Button Content="Start" MinWidth="100" Height="32" VerticalContentAlignment="Center" />
         <Button ToolTip.Tip="Settings" Content="&#xE713;" FontFamily="Segoe Fluent Icons"
-                Height="32" Margin="8,0,0,0" FontSize="16" VerticalContentAlignment="Center" />
+                Height="32" FontSize="16" VerticalContentAlignment="Center" />
       </StackPanel>
     </Grid>
 
-    <!-- ==================== OVERALL PROGRESS ==================== -->
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="12"
-                Margin="0,8,0,0" VerticalAlignment="Center">
-      <TextBlock Text="0/0 files" VerticalAlignment="Center" />
-      <ProgressBar Value="0" Maximum="100" Width="200" VerticalAlignment="Center" />
-      <Button Content="Pause" IsEnabled="False" />
-      <Button Content="Cancel" IsEnabled="False" />
-    </StackPanel>
-
-    <!-- ==================== FILE QUEUE ==================== -->
+    <!-- ==================== FILE QUEUE + PROGRESS (combined) ==================== -->
     <!-- This is the last child in the DockPanel, so it fills all remaining space -->
-    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1" CornerRadius="4" Padding="4">
-      <ListBox>
-        <!-- Placeholder items; will be replaced with data binding later -->
-        <ListBoxItem>
-          <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-            <TextBlock Grid.Column="0" Text="video1.mp4" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" Text="1.2 GB" VerticalAlignment="Center" Margin="16,0" />
-            <ProgressBar Grid.Column="2" Value="60" Maximum="100" Width="120"
-                         VerticalAlignment="Center" Margin="0,0,16,0" />
-            <TextBlock Grid.Column="3" Text="ETA 2:30" VerticalAlignment="Center" />
-          </Grid>
-        </ListBoxItem>
-        <ListBoxItem>
-          <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-            <TextBlock Grid.Column="0" Text="video2.mkv" VerticalAlignment="Center" />
-            <TextBlock Grid.Column="1" Text="800 MB" VerticalAlignment="Center" Margin="16,0" />
-            <ProgressBar Grid.Column="2" Value="0" Maximum="100" Width="120"
-                         VerticalAlignment="Center" Margin="0,0,16,0" />
-            <TextBlock Grid.Column="3" Text="Pending" VerticalAlignment="Center" />
-          </Grid>
-        </ListBoxItem>
-      </ListBox>
-    </Border>
+    <DockPanel>
+      <!-- Overall progress bar: flat top corners, rounded bottom corners — flush under the queue -->
+      <ProgressBar DockPanel.Dock="Bottom" Value="30" Maximum="100"
+                   MinHeight="6" CornerRadius="0,0,4,4" />
+
+      <!-- File queue: rounded top, flat bottom -->
+      <Border BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+              BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="4">
+        <ListBox>
+          <!-- Placeholder items; will be replaced with data binding later -->
+          <ListBoxItem>
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+              <TextBlock Grid.Column="0" Text="video1.mp4" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="1.2 GB" VerticalAlignment="Center" Margin="16,0" />
+              <ProgressBar Grid.Column="2" Value="60" Maximum="100" Width="120"
+                           VerticalAlignment="Center" Margin="0,0,16,0" />
+              <TextBlock Grid.Column="3" Text="ETA 2:30" VerticalAlignment="Center" />
+            </Grid>
+          </ListBoxItem>
+          <ListBoxItem>
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+              <TextBlock Grid.Column="0" Text="video2.mkv" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="800 MB" VerticalAlignment="Center" Margin="16,0" />
+              <ProgressBar Grid.Column="2" Value="0" Maximum="100" Width="120"
+                           VerticalAlignment="Center" Margin="0,0,16,0" />
+              <TextBlock Grid.Column="3" Text="Pending" VerticalAlignment="Center" />
+            </Grid>
+          </ListBoxItem>
+        </ListBox>
+      </Border>
+    </DockPanel>
 
   </DockPanel>
 
