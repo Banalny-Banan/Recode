@@ -7,13 +7,11 @@
              x:Class="Recode.Views.FileQueue"
              x:DataType="vm:MainWindowViewModel">
 
-  <DockPanel>
-
-    <ProgressBar DockPanel.Dock="Bottom" Value="{Binding OverallProgress}" Maximum="100" MinHeight="6" CornerRadius="0,0,4,4" />
+  <Grid RowDefinitions="*,Auto" RowSpacing="4">
 
     <Border BorderBrush="{DynamicResource AppBorderBrush}"
             Background="{DynamicResource AppInsetBrush}"
-            BorderThickness="1,1,1,0" CornerRadius="4,4,0,0" Padding="0">
+            BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0">
       <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <ScrollViewer.Styles>
           <Style Selector="RepeatButton">
@@ -38,6 +36,8 @@
       </ScrollViewer>
     </Border>
 
-  </DockPanel>
+    <ProgressBar Grid.Row="1" Value="{Binding OverallProgress}" Maximum="100" MinHeight="6" CornerRadius="0,0,4,4" />
+
+  </Grid>
 
 </UserControl>

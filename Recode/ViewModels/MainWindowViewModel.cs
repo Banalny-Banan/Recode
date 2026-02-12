@@ -10,7 +10,7 @@ namespace Recode.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(QualityLabel)), NotifyPropertyChangedFor(nameof(QualityPercent))]
     int _qualityValue = 50;
 
     [ObservableProperty]
@@ -20,6 +20,17 @@ public partial class MainWindowViewModel : ViewModelBase
     AfterCompletionAction _afterCompletionAction = AfterCompletionAction.Nothing;
 
     public double OverallProgress => QueueItems.Count == 0 ? 0 : QueueItems.Average(item => item.Progress);
+
+    public string QualityLabel => QualityValue switch
+    {
+        <= 15 => "Smallest",
+        <= 35 => "Smaller",
+        <= 65 => "Balanced",
+        <= 85 => "High Quality",
+        _ => "Lossless",
+    };
+
+    public string QualityPercent => $"{QualityValue}%";
 
     public ObservableCollection<QueueItemViewModel> QueueItems { get; } = [];
 
