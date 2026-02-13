@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Recode.Core.Enums;
 using Recode.Core.Services.Compression;
 using Recode.Core.Services.Ffmpeg;
 using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.History;
 using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;
 using Recode.Core.Utility;
@@ -21,6 +23,7 @@ public partial class MainWindowViewModel : ViewModelBase
     readonly IFfmpegManager? _ffmpegManager;
     readonly ICompressionService? _compressionService;
     readonly IPowerService? _powerService;
+    readonly IHistoryService? _historyService;
     CancellationTokenSource? _compressionCts;
     CancellationTokenSource? _countdownCts;
 
@@ -36,10 +39,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(QualityLabel))]
     int _qualityValue;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(OutputPathTooltip))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(OutputPathTooltip)), NotifyPropertyChangedFor(nameof(StartButtonEnabled))]
     string _outputPath;
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(StartButtonEnabled))]
     bool _replaceFiles;
 
     [ObservableProperty]
@@ -60,11 +63,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     string _countdownMessage = "";
 
-    public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, IPowerService powerService, ISettingsService settingsService)
+    public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, IPowerService powerService, IHistoryService historyService, ISettingsService settingsService)
     {
         _ffmpegManager = ffmpegManager;
         _compressionService = compressionService;
         _powerService = powerService;
+        _historyService = historyService;
         _settingsService = settingsService;
         AppSettings settings = _settingsService.Load();
         _selectedCodec = settings.SelectedCodec;
@@ -92,7 +96,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _ => "Lossless",
     };
 
-    public bool StartButtonEnabled => FfMpegReady;
+    public bool StartButtonEnabled => FfMpegReady && (!string.IsNullOrEmpty(OutputPath) || ReplaceFiles);
 
     public string OutputPathTooltip => string.IsNullOrEmpty(OutputPath) ? "Select output folder" : OutputPath;
 
@@ -100,11 +104,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<QueueItemViewModel> QueueItems { get; } = [];
 
+    public bool IsAlreadyCompressed(string filePath)
+        => _historyService?.IsCompressed(filePath) ?? false;
+
     public void AddFiles(IEnumerable<string> filePaths)
     {
         foreach (string path in filePaths)
         {
-            // skip duplicates
             if (QueueItems.Any(item => item.FilePath == path))
                 continue;
 
@@ -121,7 +127,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsCompressing = true;
         CancelButtonEnabled = true;
         _compressionCts = new CancellationTokenSource();
-        CompressionOptions options = new(SelectedCodec, QualityValue);
+        FfMpegOptions options = new(SelectedCodec, QualityValue);
         OutputOptions output = new(OutputPath, ReplaceFiles);
 
         try
@@ -144,6 +150,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     item.Progress = 100;
                     item.ResultSize = Formatting.FormatFileSize(result.OutputSize);
                     item.Status = QueueItemStatus.Completed;
+                    _historyService?.RecordCompressed(result.OutputPath);
                 }
                 else
                 {
@@ -156,6 +163,7 @@ public partial class MainWindowViewModel : ViewModelBase
                     else
                     {
                         item.Status = QueueItemStatus.Failed;
+                        Debug.WriteLine($"Compression failed for {item.FilePath}: {result.ErrorMessage}");
                     }
                 }
 
@@ -203,7 +211,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         try
         {
-            for (int i = 20; i > 0; i--)
+            for (var i = 20; i > 0; i--)
             {
                 CountdownSeconds = i;
                 CountdownMessage = $"{action} in {i} seconds...";

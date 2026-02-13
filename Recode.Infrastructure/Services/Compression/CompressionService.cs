@@ -8,31 +8,42 @@ public class CompressionService(IFfMpegService ffMpegService) : ICompressionServ
     public async Task<CompressionResult> CompressFileAsync
     (
         string inputPath,
-        CompressionOptions options,
+        FfMpegOptions options,
         OutputOptions output,
         IProgress<double> progress,
         CancellationToken cancellationToken)
     {
-        string outputPath = ResolveOutputPath(inputPath, output);
-        CompressionResult result = await ffMpegService.CompressAsync(inputPath, outputPath, options, progress, cancellationToken);
+        string finalPath = ResolveOutputPath(inputPath, output);
+        bool needsMove = string.Equals(Path.GetFullPath(finalPath), Path.GetFullPath(inputPath), StringComparison.OrdinalIgnoreCase);
+        string outputPath = needsMove ? TempPathFor(inputPath) : finalPath;
+
+        FfMpegResult result = await ffMpegService.CompressAsync(inputPath, outputPath, options, progress, cancellationToken);
 
         if (!result.Success)
-            return result;
+            return new CompressionResult(false, result.ErrorMessage, 0, finalPath);
 
         long outputSize = new FileInfo(outputPath).Length;
 
-        if (output.ReplaceOriginal)
-            File.Move(outputPath, inputPath, true);
+        if (needsMove)
+            File.Move(outputPath, finalPath, true);
 
-        return result with { OutputSize = outputSize };
+        return new CompressionResult(true, null, outputSize, finalPath);
     }
 
     static string ResolveOutputPath(string inputPath, OutputOptions output)
     {
         if (output.ReplaceOriginal)
-            return $"{inputPath}.temp";
+            return inputPath;
 
         Directory.CreateDirectory(output.OutputFolder);
         return Path.Combine(output.OutputFolder, Path.GetFileName(inputPath));
+    }
+
+    static string TempPathFor(string filePath)
+    {
+        string dir = Path.GetDirectoryName(filePath)!;
+        string name = Path.GetFileNameWithoutExtension(filePath);
+        string ext = Path.GetExtension(filePath);
+        return Path.Combine(dir, $"{name}.temp{ext}");
     }
 }

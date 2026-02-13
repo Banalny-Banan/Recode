@@ -10,11 +10,11 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
 {
     readonly string _ffmpegPath = ffmpegManager.FfmpegPath;
 
-    public async Task<CompressionResult> CompressAsync
+    public async Task<FfMpegResult> CompressAsync
     (
         string inputPath,
         string outputPath,
-        CompressionOptions options,
+        FfMpegOptions options,
         IProgress<double> progress,
         CancellationToken cancellationToken)
     {
@@ -23,7 +23,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
             TimeSpan duration = await ProbeDurationAsync(inputPath, cancellationToken);
 
             if (duration <= TimeSpan.Zero)
-                return new CompressionResult(false, "Could not determine file duration");
+                return new FfMpegResult(false, "Could not determine file duration");
 
             var lastStderrLine = "";
 
@@ -41,20 +41,20 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
                 .ExecuteAsync(cancellationToken);
 
             if (result.ExitCode != 0)
-                return new CompressionResult(false, lastStderrLine);
+                return new FfMpegResult(false, lastStderrLine);
 
-            return new CompressionResult(true, null);
+            return new FfMpegResult(true, null);
         }
         catch (OperationCanceledException)
         {
             if (File.Exists(outputPath))
                 File.Delete(outputPath);
 
-            return new CompressionResult(false, "Compression was cancelled");
+            return new FfMpegResult(false, "Compression was cancelled");
         }
         catch (Exception ex)
         {
-            return new CompressionResult(false, ex.Message);
+            return new FfMpegResult(false, ex.Message);
         }
     }
 
@@ -80,7 +80,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         return duration;
     }
 
-    static string[] BuildArguments(string inputPath, string outputPath, CompressionOptions options)
+    static string[] BuildArguments(string inputPath, string outputPath, FfMpegOptions options)
     {
         int crf = CalculateCrf(options.Codec, options.Quality);
         string encoder = GetEncoder(options.Codec);

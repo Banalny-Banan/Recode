@@ -4,14 +4,14 @@ namespace Recode.Core.Services.Ffmpeg;
 
 public interface IFfMpegService
 {
-    Task<CompressionResult> CompressAsync
+    Task<FfMpegResult> CompressAsync
     (
         string inputPath,
         string outputPath,
-        CompressionOptions options,
+        FfMpegOptions options,
         IProgress<double> progress,
         CancellationToken cancellationToken);
 }
 
-public record struct CompressionResult(bool Success, string? ErrorMessage, long OutputSize = 0);
-public record struct CompressionOptions(Codec Codec, int Quality);
+public record struct FfMpegResult(bool Success, string? ErrorMessage);
+public record struct FfMpegOptions(Codec Codec, int Quality);

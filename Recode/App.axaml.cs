@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Recode.Core.Services.Compression;
 using Recode.Core.Services.Ffmpeg;
 using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.History;
 using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;
 using Recode.Infrastructure.Services.Compression;
 using Recode.Infrastructure.Services.FfMpeg;
+using Recode.Infrastructure.Services.History;
 using Recode.Infrastructure.Services.Power;
 using Recode.Infrastructure.Services.Settings;
 using Recode.ViewModels;
@@ -45,6 +47,7 @@ public partial class App : Application
             services.AddSingleton<IFfMpegService, FfMpegService>();
             services.AddSingleton<ICompressionService, CompressionService>();
             services.AddSingleton<IPowerService, PowerService>();
+            services.AddSingleton<IHistoryService, HistoryService>();
 
             // Build the factory
             ServiceProvider provider = services.BuildServiceProvider();
