@@ -10,12 +10,12 @@ public class TooltipAttribute(string text) : Attribute
 
 public enum Codec
 {
-    [Description("H.264"), Tooltip("Best compatibility, fast encoding, widely supported by all devices")]
+    [Description("H.264"), Tooltip("Fast encoding and balanced quality")]
     H264,
     [Description("H.265"), Tooltip("Better compression than H.264 at same quality, slower encoding")]
     H265,
-    [Description("VP9"), Tooltip("Google's open codec, good for web video, comparable to H.265")]
+    [Description("VP9"), Tooltip("Best compression for low quality settings, slower encoding, outputs .webm")]
     Vp9,
-    [Description("AV1"), Tooltip("Best compression, very slow encoding, growing device support")]
+    [Description("AV1"), Tooltip("Best compression, very slow encoding")]
     Av1,
 }

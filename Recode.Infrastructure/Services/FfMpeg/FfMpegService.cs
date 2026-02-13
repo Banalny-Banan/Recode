@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using CliWrap;
 using Recode.Core.Enums;
+using Recode.Core.Services.Ffmpeg;
 using Recode.Core.Services.FfmpegManager;
-using Recode.Core.Services.FfMpegService;
 
-namespace Recode.Infrastructure.Services.FfMpegService;
+namespace Recode.Infrastructure.Services.FfMpeg;
 
 public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegService
 {

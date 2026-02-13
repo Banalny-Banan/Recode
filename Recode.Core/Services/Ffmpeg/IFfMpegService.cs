@@ -1,6 +1,6 @@
 using Recode.Core.Enums;
 
-namespace Recode.Core.Services.FfMpegService;
+namespace Recode.Core.Services.Ffmpeg;
 
 public interface IFfMpegService
 {

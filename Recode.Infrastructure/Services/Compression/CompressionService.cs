@@ -1,5 +1,5 @@
 using Recode.Core.Services.Compression;
-using Recode.Core.Services.FfMpegService;
+using Recode.Core.Services.Ffmpeg;
 
 namespace Recode.Infrastructure.Services.Compression;
 
