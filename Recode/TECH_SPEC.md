@@ -8,18 +8,16 @@ Recode is a Windows desktop video compression utility. Users drop video files in
 
 ## 2. Technology Stack
 
-| Layer                    | Technology                                | Rationale                                                                         |
-|--------------------------|-------------------------------------------|-----------------------------------------------------------------------------------|
-| **Runtime**              | .NET 9                                    | Best performance, single-file publish                                             |
-| **UI Framework**         | Avalonia UI 11                            | Cross-platform XAML, first-class Rider support (previewer, Hot Reload, templates) |
-| **MVVM**                 | CommunityToolkit.Mvvm                     | Source-generated, lightweight, official Microsoft toolkit                         |
-| **Dependency Injection** | Microsoft.Extensions.DependencyInjection  | Standard .NET DI container                                                        |
-| **Configuration**        | Microsoft.Extensions.Configuration + JSON | Structured settings with hot-reload                                               |
-| **Logging**              | Serilog (file + debug sinks)              | Structured logging                                                                |
-| **FFmpeg wrapper**       | CliWrap                                   | Piped output, cancellation tokens, robust process lifecycle                       |
-| **Serialization**        | System.Text.Json                          | Built-in, source-generated                                                        |
-| **Theming**              | Semi.Avalonia                             | Fluent-style theme pack with light/dark modes and accent colors                   |
-| **Packaging**            | Single-file self-contained                | Zero-install portable executable                                                  |
+| Layer                    | Technology                               | Rationale                                                                        |
+|--------------------------|------------------------------------------|----------------------------------------------------------------------------------|
+| **Runtime**              | .NET 9                                   | Best performance, single-file publish                                            |
+| **UI Framework**         | Avalonia UI 11                           | Cross-platform XAML, first-class Rider support (previewer, Hot Reload, templates) |
+| **MVVM**                 | CommunityToolkit.Mvvm                    | Source-generated, lightweight, official Microsoft toolkit                         |
+| **Dependency Injection** | Microsoft.Extensions.DependencyInjection | Standard .NET DI container                                                       |
+| **FFmpeg wrapper**       | CliWrap                                  | Piped output, cancellation tokens, robust process lifecycle                      |
+| **Serialization**        | System.Text.Json                         | Built-in, source-generated                                                       |
+| **Theming**              | Avalonia FluentTheme                     | Built-in light/dark themes with custom accent colors via Palettes                |
+| **Packaging**            | Single-file self-contained               | Zero-install portable executable                                                 |
 
 ---
 
@@ -30,37 +28,36 @@ Recode is a Windows desktop video compression utility. Users drop video files in
 ```
 Recode.sln
 |
-+-- src/
-|   +-- Recode/                      # Avalonia app (entry point, views, DI setup)
-|   +-- Recode.Core/                 # Business logic, models, interfaces
-|   +-- Recode.Infrastructure/       # FFmpeg integration, file system, OS APIs
-|
++-- Recode/                      # Avalonia app (entry point, views, DI setup)
++-- Recode.Core/                 # Interfaces, enums, models, utilities
++-- Recode.Infrastructure/       # FFmpeg integration, file system, settings persistence
 ```
 
 ### 3.2 Layer Responsibilities
 
 **Recode.Core** (class library, no UI or platform dependencies)
 
-- Domain models (`CompressionJob`, `CompressionSettings`)
-- Service interfaces (`ICompressionService`, `IFfmpegManager`, `ISettingsService`)
-- Enums (`CodecType`, `PostAction`)
-- Progress reporting contracts
+- Service interfaces (`ICompressionService`, `IFfMpegService`, `IFfmpegManager`, `ISettingsService`)
+- Enums (`Codec`, `AfterCompletionAction`)
+- Data types (`CompressionOptions`, `CompressionResult`, `OutputOptions`, `AppSettings`)
+- Utilities (`Formatting`)
+- Custom attributes (`TooltipAttribute`)
 
 **Recode.Infrastructure** (class library, platform-specific implementations)
 
-- `FfmpegManager` - FFmpeg auto-download, version detection, path resolution
-- `FfmpegCompressionService` - FFmpeg process management via CliWrap
+- `FfmpegManager` - FFmpeg auto-download to `%LOCALAPPDATA%\Recode\`
+- `FfMpegService` - FFmpeg process execution and progress parsing via CliWrap
+- `CompressionService` - Orchestrates compression with output path resolution and file replacement
 - `SettingsService` - JSON-based persistent settings
-- `PowerManagementService` - Sleep/shutdown via Windows APIs
 
 **Recode** (Avalonia desktop executable)
 
-- `App.axaml` - DI container setup, theme configuration
-- `MainWindow.axaml` - Single window with title bar gear icon for settings
-- `CompressionView.axaml` - Main (and only) view
-- `SettingsWindow.axaml` - Separate window opened from gear icon
-- `CompressionViewModel`, `SettingsViewModel`
-- Converters, styles, resources
+- `App.axaml` - DI container setup, theme configuration with centralized color resources
+- `MainWindow.axaml` - Single window shell with Grid layout
+- UserControls: `FileDropZone`, `CompressionControls`, `FileQueue`, `ControlBar`
+- Custom controls: `EnumSelector` (reusable enum-to-ListBox/ComboBox)
+- `MainWindowViewModel` (with `MainWindowViewModel.Settings.cs` partial)
+- `QueueItemViewModel`
 
 ### 3.3 Dependency Flow
 
@@ -81,163 +78,132 @@ Views depend on ViewModels. ViewModels depend on Core interfaces only. Infrastru
 
 #### 4.1.1 File Input
 
-- Drag-and-drop files onto the compression area
-- "Browse" button opens file picker (multi-select)
-- Command-line arguments: `Recode.exe file1.mp4 file2.mkv`
+- Drag-and-drop files onto the drop zone (entire zone is a clickable button)
+- Click the drop zone to open file picker (multi-select)
+- Duplicate files are silently skipped
 - **Supported input**: .mp4, .mkv, .avi, .mov, .flv, .wmv, .webm, .ts, .m2ts
 
 #### 4.1.2 Codec Options
 
-| Codec      | Library    | CRF Range | Default CRF | Container | Preset             |
-|------------|------------|-----------|-------------|-----------|--------------------|
-| H.264      | libx264    | 0-51      | 23          | .mp4      | medium             |
-| H.265/HEVC | libx265    | 0-51      | 28          | .mp4      | medium             |
-| VP9        | libvpx-vp9 | 0-63      | 31          | .webm     | N/A (quality mode) |
-| AV1        | libsvtav1  | 0-63      | 35          | .mp4      | preset 6           |
+| Codec      | Library    | CRF Range | Encoder     |
+|------------|------------|-----------|-------------|
+| H.264      | libx264    | 0-51      | libx264     |
+| H.265/HEVC | libx265    | 0-51      | libx265     |
+| VP9        | libvpx-vp9 | 0-63      | libvpx-vp9  |
+| AV1        | libaom-av1 | 0-63      | libaom-av1  |
+
+Each codec has a `[Tooltip]` attribute with usage guidance shown on hover.
+
+Audio is always copied without re-encoding (`-c:a copy`).
 
 #### 4.1.3 Output Mode
 
-Two modes, toggled via a control on the compression page:
+Two modes, toggled via a checkbox on the compression controls:
 
 **Replace original**
 
-- Encode to a temp file in the same directory as the source
-- On success: delete original, rename temp to original filename
-- On failure: delete temp, original is untouched
-- If the codec changes the container (e.g., VP9 → .webm), the replacement gets the new extension and the original is deleted
+- Encode to a temp file (`input.mp4.temp`) in the same directory as the source
+- On success: atomic overwrite via `File.Move(temp, original, overwrite: true)`
+- On failure/cancellation: temp file cleaned up by FfMpegService
 
 **Output to folder**
 
-- Encode to a configurable output directory (default: `Videos\Recode\`)
+- Encode to a user-selected output directory
 - Original files are never modified
-- If a file with the same name already exists in output, auto-rename with suffix (`_1`, `_2`, ...)
+- Existing files in the output folder are overwritten silently
 
 #### 4.1.4 Compression Controls
 
-- **Quality slider**: Labeled scale from "Visually Lossless" to "Smallest File", mapped to codec-specific CRF ranges
-- **Replace original**: Configured in Settings (see 4.3.2). When on, replaces source files (see 4.1.3). When off, outputs to folder.
+- **Codec selector**: `EnumSelector` in List mode (horizontal segmented control)
+- **Quality slider**: 0-100 mapped inversely to codec-specific CRF ranges. Tooltip shows label (Smallest / Smaller / Balanced / High Quality / Lossless)
+- **Output path**: Read-only TextBox that opens a folder picker on click
+- **Replace files**: CheckBox that disables the output path when checked
 
 #### 4.1.5 Compression Queue & Progress
 
-- File queue displayed as a list with per-file status (Pending / Encoding / Done / Failed)
-- Per-file progress bar with percentage, elapsed time, and ETA
-- Overall progress bar showing files completed / total
-- Estimated output file size (based on current bitrate)
-- **Start / Queue button**: Shows "Start" when idle. Changes to "Queue" while compression is running — adding new files appends them to the end of the queue
-- **Reorder**: Pending items in the queue can be reordered via drag-and-drop (the currently encoding file cannot be moved)
-- **Cancel**: Stop current file with option to skip or abort entire queue
-- **Pause/Resume**: Suspend FFmpeg process
+- File queue displayed as an `ItemsControl` with per-file progress bar and status icon
+- Status icons: dash (Pending), circular arrow (Processing), checkmark (Completed), X (Failed)
+- Per-file size display shows `3.5 MB → 945 KB` after completion
+- Overall progress bar below the queue
+- **Start button**: Always enabled when FFmpeg is ready. If compression is already running, the loop picks up any newly added pending items automatically
+- **Cancel button**: Cancels the current FFmpeg process via `CancellationToken`. The current file reverts to Pending, remaining files stay Pending
 
 #### 4.1.6 Post-Compression Actions
 
 - Do nothing (default)
-- Sleep
-- Shutdown
-- Open output folder
-- Play notification sound
+- Sleep the computer
+- Shut down the computer
 
-#### 4.1.7 Completion Summary
+#### 4.1.7 Duplicate Processing Prevention (planned)
 
-- Notification banner showing: files processed, total size saved, total time, per-file breakdown (original size -> compressed size, ratio)
+- Store a list of file content hashes (SHA-256 of first/last N bytes) of previously compressed files
+- Saved to `%APPDATA%\Recode\history.json` alongside settings
+- When adding files to the queue, check against history and warn/skip already-processed files
+- Hash is recorded after successful compression
 
 ---
 
 ### 4.2 FFmpeg Auto-Download
 
-FFmpeg is **not bundled** with the app. It is downloaded on first launch, keeping the distributed app small.
+FFmpeg is **not bundled** with the app. It is downloaded on first launch.
 
 #### 4.2.1 Download Source
 
-**Primary**: [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) essentials build (~45 MB zip).
+[gyan.dev](https://www.gyan.dev/ffmpeg/builds/) essentials build (~45 MB zip).
 
 - Stable URL: `https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip`
-- Contains all required codecs (libx264, libx265, libvpx-vp9, libsvtav1)
-- Linked from the official ffmpeg.org downloads page
+- Contains all required codecs (libx264, libx265, libvpx-vp9, libaom-av1)
 
-**Fallback**: [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds/releases) on GitHub.
-
-- Use GitHub API (`GET /repos/BtbN/FFmpeg-Builds/releases/latest`) to resolve the latest release
-- Asset pattern: `ffmpeg-master-latest-win64-gpl.zip`
-- Larger (~80 MB zip) but guaranteed to have all GPL-licensed codecs
-
-#### 4.2.2 Resolution Order
-
-```
-1. User-configured path (from Settings)                            --> use if valid
-2. App-local path: %LOCALAPPDATA%\Recode\ffmpeg\ffmpeg.exe     --> use if exists
-3. System PATH                                                     --> use if found
-4. Not found                                                       --> trigger download to (2)
-```
-
-#### 4.2.3 Download Flow
+#### 4.2.2 Download Flow
 
 ```
 App launch
   |
   +--> IFfmpegManager.EnsureAvailableAsync()
          |
-         +--> Found locally? --> yes --> done
+         +--> Found at %LOCALAPPDATA%\Recode\ffmpeg.exe? --> yes --> done
          |
-         +--> no --> Banner: "FFmpeg is required. Download now? (~45 MB)"
-                     [Download]  [Choose existing...]
-                       |
-                       +--> Download with progress bar
-                       |      - Stream zip to %TEMP% via HttpClient
-                       |      - Extract only ffmpeg.exe from zip
-                       |      - Move to %LOCALAPPDATA%\Recode\ffmpeg\
-                       |      - Verify: `ffmpeg -version`
-                       |      - Clean up temp zip
-                       |
-                       +--> On failure: error with retry button and
-                            manual download link (opens browser)
+         +--> no --> Download with progress bar in MainWindow
+                      - Stream zip to %TEMP% via HttpClient (with cancellation support)
+                      - Extract only ffmpeg.exe from zip
+                      - Move to %LOCALAPPDATA%\Recode\
+                      - Clean up temp zip
+                      |
+                      +--> On failure: error dialog, app closes
 ```
 
-#### 4.2.4 Update Check
-
-- On startup (max once per day), HEAD request to compare against stored version
-- If newer available, non-blocking banner: "FFmpeg update available. [Update]"
-- User can ignore — existing version keeps working
-
-#### 4.2.5 Storage
+#### 4.2.3 Storage
 
 ```
 %LOCALAPPDATA%\Recode\
-  ffmpeg\
-    ffmpeg.exe
-    version.json        # { "version": "7.1", "downloadedUtc": "...", "source": "gyan.dev" }
+  ffmpeg.exe
 ```
 
-#### 4.2.6 Constraints
+#### 4.2.4 Constraints
 
-- Download does not block app startup — UI loads immediately, compression disabled until FFmpeg is ready
-- User can override with a custom path in Settings
+- Progress bar shown in MainWindow during download, compression disabled until FFmpeg is ready
 - No admin privileges required — `%LOCALAPPDATA%` is user-writable
+- All instances of the app share the same ffmpeg.exe
 
 ---
 
 ### 4.3 Settings
 
-Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia does not have a built-in ContentDialog; a modal child window is the standard approach).
+No settings window. All compression preferences are persisted automatically as the user changes them via `On<Property>Changed` partial methods.
 
-#### 4.3.1 General
+#### 4.3.1 Persisted Values
 
-- **Theme**: System / Light / Dark
-- **Accent color**: Color picker to override the default Avalonia accent color
-- **FFmpeg path**: Auto-detected or manual override (folder picker)
-
-#### 4.3.2 Compression Defaults
-
-- Default codec
-- Default quality level
+- Selected codec
+- Quality level
 - Replace original (on/off)
-- Output directory (for when replace is off)
-- Default post-action
+- Output directory
+- After-completion action
 
-#### 4.3.3 Storage
+#### 4.3.2 Storage
 
 - Settings file: `%APPDATA%\Recode\settings.json`
-- Schema-versioned for forward migration
-- Hot-reload: changes apply immediately
+- Settings loaded in ViewModel constructor (assigned to backing fields to avoid triggering saves)
+- Corrupted file resets to defaults
 
 ---
 
@@ -245,214 +211,100 @@ Opened via gear icon in the title bar. Opens as a separate `Window` (Avalonia do
 
 ### 5.1 Window
 
-- **Single window**, no navigation sidebar
-- **Title bar**: App name on the left, gear icon button on the right
-- **Min size**: 700 x 500
-- **Default size**: 900 x 600
+- **Single window**, no navigation
+- **Default size**: 600 x 400
 - **Resizable**: Yes
-- **Min/Max/Close**: Standard window chrome buttons
-- The entire window content is the compression view
+- **Min/Max/Close**: Standard window chrome
 
-### 5.2 Compression View Layout
+### 5.2 Layout
 
-```
-+--[ Recode ]--------------------------------------[gear]--+
-|                                                               |
-|  +-----------------------------------------------------------+
-|  |  [Browse Files]  or drag & drop files here                 |
-|  +-----------------------------------------------------------+
-|                                                               |
-|  Codec:    [H.264] [H.265] [VP9] [AV1]   (segmented control) |
-|  Quality:  [====O==========================] Balanced          |
-|                                                               |
-|  Queue:                                                        |
-|  +-----------------------------------------------------------+
-|  | video1.mp4    1.2 GB    [|||||||||||60%]  ETA 2:30         |
-|  | video2.mkv    800 MB    Pending                             |
-|  | video3.avi    2.1 GB    Pending                             |
-|  +-----------------------------------------------------------+
-|  Overall: 1/3 files  [||||||33%]        [Pause] [Cancel]      |
-|                                                               |
-|  After completion: [Do nothing v]  [x] Replace  [Start] [gear] |
-+---------------------------------------------------------------+
-```
-
-When "Output to folder" is selected, a folder path + browse button appears inline.
-
-### 5.3 Settings Window
-
-Separate modal window:
+MainWindow uses a Grid with `RowDefinitions="Auto,Auto,*,Auto,Auto"` and 16px margin:
 
 ```
-+-- Settings -------------------------------------------[X]--+
-|                                                             |
-|  Appearance                                                 |
-|  +-------------------------------------------------------+ |
-|  | Theme                          [System v]              | |
-|  +-------------------------------------------------------+ |
-|                                                             |
-|  Compression Defaults                                       |
-|  +-------------------------------------------------------+ |
-|  | Default codec                  [H.265 v]              | |
-|  | Default quality                [====O========]         | |
-|  | Replace original               [x]                    | |
-|  | Default output directory       C:\...\  [Browse]       | |
-|  | After completion               [Do nothing v]          | |
-|  +-------------------------------------------------------+ |
-|                                                             |
-|  FFmpeg                                                     |
-|  +-------------------------------------------------------+ |
-|  | Location       Auto-detected (7.1)        [Change]    | |
-|  | [Check for update]                                     | |
-|  +-------------------------------------------------------+ |
-|                                                             |
-|  About                                                      |
-|  +-------------------------------------------------------+ |
-|  | Recode v1.0.0                                      | |
-|  +-------------------------------------------------------+ |
-+-------------------------------------------------------------+
++--[ Recode ]------------------------------------------+
+|                                                       |
+|  +---------------------------------------------------+
+|  |  Drop files here or click to browse                |
+|  +---------------------------------------------------+
+|                                                       |
+|  Codec:   [H.264] [H.265] [VP9] [AV1]               |
+|  Quality: [====O==============] (tooltip: Balanced)   |
+|                     Output: [C:\...\Recode  ]  [x] Replace |
+|                                                       |
+|  +---------------------------------------------------+
+|  | video1.mp4   1.2 GB → 450 MB  [||||||||||] ✓      |
+|  | video2.mkv   800 MB           [||||      ] ↻      |
+|  | video3.avi   2.1 GB           [          ] —      |
+|  +---------------------------------------------------+
+|  [======================== overall ==================] |
+|                                                       |
+|  After completion: [Do nothing v]    [Cancel] [Start] |
++-------------------------------------------------------+
 ```
 
-### 5.4 Theming
+### 5.3 Theming
 
-- **Theme library**: Semi.Avalonia — provides polished light/dark themes with grouped settings-card style controls
-- **Default**: Follow system theme (Windows light/dark mode) via `RequestedThemeVariant`
-- **Accent color**: Follow Windows accent or use a fixed app accent
-- Standard Avalonia controls (TextBox, Slider, ComboBox, ProgressBar, RadioButton, ListBox) — Semi.Avalonia styles them consistently
+- **Theme**: Avalonia FluentTheme with custom accent colors via `FluentTheme.Palettes`
+- **Color resources**: Centralized in `App.axaml` with `ThemeDictionaries` for Light/Dark variants
+- **Custom resources**: AppBackgroundBrush, AppSurfaceBrush, AppInsetBrush, AppTextPrimaryBrush, AppTextSecondaryBrush, AppTextDisabledBrush, AppTextOnAccentBrush, AppBorderBrush, AppErrorBrush, AppSuccessBrush, AppWarningBrush
 
 ---
 
-## 6. Data Models
+## 6. FFmpeg Integration
 
-Models and enums will be created as needed during development.
-
----
-
-## 7. Service Interfaces
-
-```csharp
-public interface ICompressionService
-{
-    IAsyncEnumerable<CompressionProgress> CompressAsync(
-        CompressionJob job,
-        CancellationToken ct = default);
-
-    Task PauseAsync();
-    Task ResumeAsync();
-}
-
-public record CompressionProgress(
-    double Fraction,                     // 0.0 - 1.0
-    TimeSpan Elapsed,
-    TimeSpan? Estimated,
-    long BytesWritten);
-
-public interface IFfmpegManager
-{
-    string? ResolvedPath { get; }
-    bool IsAvailable { get; }
-    string? Version { get; }
-
-    Task DownloadAsync(
-        IProgress<double>? progress = null,
-        CancellationToken ct = default);
-
-    Task<bool> CheckForUpdateAsync(CancellationToken ct = default);
-}
-
-public interface ISettingsService
-{
-    AppSettings Current { get; }
-    Task SaveAsync();
-    event Action? SettingsChanged;
-}
-
-public interface IPowerManagementService
-{
-    void Sleep();
-    void Shutdown();
-}
-```
-
----
-
-## 8. FFmpeg Integration
-
-### 8.1 Process Lifecycle (via CliWrap)
+### 6.1 Process Lifecycle (via CliWrap)
 
 ```
-1. Resolve path via IFfmpegManager.ResolvedPath
-2. Build argument string from CompressionJob
+1. Probe duration: ffmpeg -i input -hide_banner (parse Duration from stderr)
+2. Build arguments from codec + quality
 3. Start process via CliWrap:
-   - Stdout piped (for -progress output)
-   - Stderr piped (for error capture)
-   - Stdin open (for sending 'q' to gracefully quit)
-   - CancellationToken linked to UI cancel
-4. Parse progress stream in real-time
-5. On completion: validate output file exists and is non-zero
-6. On cancellation: send 'q', wait 5s, then force kill
-7. On app crash: Windows Job Object ensures FFmpeg terminates
+   - -y -nostdin flags (overwrite, don't hang)
+   - Stderr piped for progress parsing and error capture
+   - CancellationToken kills process on cancel
+4. Parse time=HH:MM:SS.xx from stderr, report as progress / duration * 100
+5. On non-zero exit code: return last stderr line as error
+6. On cancellation: partial output file deleted by service
 ```
 
-### 8.2 Argument Construction
+### 6.2 Argument Construction
 
 ```
-H.264:  -i "input.mp4" -c:v libx264 -preset medium -crf 23 -c:a copy "output.mp4"
-H.265:  -i "input.mkv" -c:v libx265 -preset medium -crf 28 -c:a aac -b:a 128k "output.mp4"
-VP9:    -i "input.avi" -c:v libvpx-vp9 -b:v 0 -crf 31 -c:a copy "output.webm"
-AV1:    -i "input.mov" -c:v libsvtav1 -preset 6 -crf 35 -c:a copy "output.mp4"
+H.264:  -y -nostdin -i "input" -c:v libx264 -crf {crf} -c:a copy "output"
+H.265:  -y -nostdin -i "input" -c:v libx265 -crf {crf} -c:a copy "output"
+VP9:    -y -nostdin -i "input" -c:v libvpx-vp9 -crf {crf} -b:v 0 -c:a copy "output"
+AV1:    -y -nostdin -i "input" -c:v libaom-av1 -crf {crf} -b:v 0 -c:a copy "output"
 ```
 
-All commands include: `-progress pipe:1 -y`
+Quality slider (0-100, higher = better) mapped to CRF (lower = better):
+- H.264/H.265: `crf = 51 - (51 * quality / 100)`
+- VP9/AV1: `crf = 63 - (63 * quality / 100)`
 
-For **Replace** mode, output goes to a temp file (e.g., `input.mp4.tmp.mp4`) in the same directory. On success the original is deleted and the temp is renamed.
+### 6.3 Progress Parsing
 
-### 8.3 Progress Parsing
-
-FFmpeg's `-progress pipe:1` outputs structured key=value pairs:
-
-```
-out_time_us=5000000
-speed=2.1x
-progress=continue
-```
-
-Parse `out_time_us` against known duration (from probe pass) for fraction complete.
+Regex on stderr: `time=(\d+:\d+:\d+\.\d+)` parsed via `TimeSpan.TryParse`, divided by probed duration. Uses `[GeneratedRegex]` for compile-time regex.
 
 ---
 
-## 9. Error Handling
+## 7. Error Handling
 
-| Scenario                   | Handling                                                                             |
-|----------------------------|--------------------------------------------------------------------------------------|
-| FFmpeg not found           | Banner with [Download] and [Choose existing...]. Compression disabled until resolved |
-| FFmpeg download fails      | Error with retry button + link to manual download (opens browser)                    |
-| FFmpeg download corrupted  | Verify with `ffmpeg -version` after extraction. If fails, delete and re-prompt       |
-| FFmpeg crashes mid-encode  | Mark job as Failed, log stderr, continue to next file in queue                       |
-| Replace mode: rename fails | Keep temp file, show error with path to temp so user can recover manually            |
-| File access denied         | Show error with option to retry as admin (UAC elevation)                             |
-| Disk full during encode    | Detect via output monitoring, pause queue, notify user                               |
-| Invalid input file         | FFmpeg reports error, mark as Failed, log, skip to next                              |
-| Settings file corrupt      | Reset to defaults, log warning, notify user                                          |
-| Unexpected exception       | Global handler logs to file, shows crash dialog with "Copy log" button               |
-
-All exceptions logged via Serilog. No silent catches.
+| Scenario                  | Handling                                                     |
+|---------------------------|--------------------------------------------------------------|
+| FFmpeg not found          | Auto-download on first launch, compression disabled until ready |
+| FFmpeg download fails     | Error dialog, app closes                                     |
+| FFmpeg crashes mid-encode | Mark file as Failed, continue to next file in queue          |
+| Replace mode: move fails  | Atomic overwrite via `File.Move(overwrite: true)`            |
+| Invalid input file        | FFmpeg reports error via non-zero exit, marked as Failed     |
+| Settings file corrupt     | Reset to defaults                                            |
 
 ---
 
-## 10. Packaging & Distribution
+## 8. Packaging & Distribution
 
-FFmpeg is **not bundled** — it is downloaded on first launch (see 4.2). This keeps the distributed app small.
+FFmpeg is **not bundled** — it is downloaded on first launch (see 4.2).
 
-### Option A: Single-file portable (recommended)
-
-- `dotnet publish -r win-x64 --self-contained -p:PublishSingleFile=true -p:PublishTrimmed=true`
+- `dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true`
 - No install needed, run from any folder
+- ReadyToRun enabled for faster startup
+- Trimming disabled (breaks reflection-based code)
 - Settings in `%APPDATA%\Recode\`
-- Distributed size: ~20-30 MB (trimmed self-contained)
-
-### Option B: Framework-dependent
-
-- Requires .NET 9 runtime installed on user's machine
-- Distributed size: ~5-10 MB
-- Smaller but adds a prerequisite
+- FFmpeg in `%LOCALAPPDATA%\Recode\`
