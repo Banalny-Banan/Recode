@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -12,6 +14,27 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Loaded += OnLoaded;
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is MainWindowViewModel vm)
+            vm.PropertyChanged += OnViewModelPropertyChanged;
+    }
+
+    void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainWindowViewModel.CountdownVisible)
+            && sender is MainWindowViewModel { CountdownVisible: true })
+        {
+            if (WindowState == WindowState.Minimized)
+                WindowState = WindowState.Normal;
+
+            Activate();
+            Topmost = true;
+            Topmost = false;
+        }
     }
 
     async void OnLoaded(object? sender, RoutedEventArgs e)

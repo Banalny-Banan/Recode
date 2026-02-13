@@ -10,6 +10,7 @@ using Recode.Core.Enums;
 using Recode.Core.Services.Compression;
 using Recode.Core.Services.FfmpegManager;
 using Recode.Core.Services.FfMpegService;
+using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;
 using Recode.Core.Utility;
 
@@ -19,7 +20,9 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     readonly IFfmpegManager? _ffmpegManager;
     readonly ICompressionService? _compressionService;
+    readonly IPowerService? _powerService;
     CancellationTokenSource? _compressionCts;
+    CancellationTokenSource? _countdownCts;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(StartButtonEnabled))]
     bool _ffMpegReady;
@@ -48,10 +51,20 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     double _ffMpegDownloadProgress;
 
-    public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, ISettingsService settingsService)
+    [ObservableProperty]
+    bool _countdownVisible;
+
+    [ObservableProperty]
+    int _countdownSeconds;
+
+    [ObservableProperty]
+    string _countdownMessage = "";
+
+    public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, IPowerService powerService, ISettingsService settingsService)
     {
         _ffmpegManager = ffmpegManager;
         _compressionService = compressionService;
+        _powerService = powerService;
         _settingsService = settingsService;
         AppSettings settings = _settingsService.Load();
         _selectedCodec = settings.SelectedCodec;
@@ -154,16 +167,67 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         finally
         {
+            bool wasCancelled = _compressionCts?.IsCancellationRequested ?? false;
             IsCompressing = false;
             CancelButtonEnabled = false;
             _compressionCts?.Dispose();
             _compressionCts = null;
+
+            if (!wasCancelled)
+                await ExecuteAfterCompletionAction();
         }
     }
 
     [RelayCommand]
     void CancelCompression()
         => _compressionCts?.Cancel();
+
+    [RelayCommand]
+    void CancelCountdown()
+    {
+        _countdownCts?.Cancel();
+        CountdownVisible = false;
+    }
+
+    async Task ExecuteAfterCompletionAction()
+    {
+        if (AfterCompletionAction == AfterCompletionAction.Nothing || _powerService is null)
+            return;
+
+        string action = AfterCompletionAction == AfterCompletionAction.Shutdown
+            ? "Shutting down"
+            : "Sleeping";
+
+        CountdownVisible = true;
+        _countdownCts = new CancellationTokenSource();
+
+        try
+        {
+            for (int i = 20; i > 0; i--)
+            {
+                CountdownSeconds = i;
+                CountdownMessage = $"{action} in {i} seconds...";
+                await Task.Delay(1000, _countdownCts.Token);
+            }
+
+            CountdownVisible = false;
+
+            if (AfterCompletionAction == AfterCompletionAction.Shutdown)
+                _powerService.Shutdown();
+            else
+                _powerService.Sleep();
+        }
+        catch (OperationCanceledException)
+        {
+            // User cancelled the countdown
+        }
+        finally
+        {
+            CountdownVisible = false;
+            _countdownCts?.Dispose();
+            _countdownCts = null;
+        }
+    }
 
     QueueItemViewModel? NextPendingItem()
         => QueueItems.FirstOrDefault(item => item.Status == QueueItemStatus.Pending);
