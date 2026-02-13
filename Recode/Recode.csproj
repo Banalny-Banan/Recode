@@ -42,5 +42,14 @@
         <Compile Update="ViewModels\MainWindowViewModel.Settings.cs">
             <DependentUpon>MainWindowViewModel.cs</DependentUpon>
         </Compile>
+        <Compile Update="ViewModels\MainWindowViewModel.Countdown.cs">
+          <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+        </Compile>
+        <Compile Update="ViewModels\MainWindowViewModel.FfmpegInit.cs">
+          <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+        </Compile>
+        <Compile Update="ViewModels\MainWindowViewModel.Compression.cs">
+          <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>
