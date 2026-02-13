@@ -5,8 +5,10 @@ namespace Recode.Infrastructure.Services.FfMpeg;
 
 public class FfmpegManager : IFfmpegManager
 {
-    public string FfmpegPath { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Recode", "ffmpeg.exe");
+    static readonly string FfmpegDir = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Recode");
+    
+    public string FfmpegPath { get; } = Path.Combine(FfmpegDir, "ffmpeg.exe");
 
     public async Task<(bool Success, string? Message)> EnsureAvailableAsync(IProgress<double> progress, CancellationToken cancellationToken = default)
     {

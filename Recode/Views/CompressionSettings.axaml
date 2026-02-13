@@ -20,7 +20,11 @@
 
     <!-- Quality slider -->
     <TextBlock Grid.Row="1" Grid.Column="0" Text="Quality:" VerticalAlignment="Center" />
-    <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding QualityValue}" VerticalAlignment="Center" ToolTip.Tip="{Binding QualityLabel}" />
+    <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto">
+      <Slider Grid.Column="0" Minimum="0" Maximum="100" Value="{Binding QualityValue}" VerticalAlignment="Center" />
+      <TextBlock Grid.Column="1" Text="{Binding QualityPercentage}" VerticalAlignment="Center" Width="35" TextAlignment="Center" Margin="4,0,0,0"
+                 Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+    </Grid>
 
     <!-- Output path selector -->
     <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding OutputPath}" Watermark="Output folder..." Focusable="False" IsEnabled="{Binding !ReplaceFiles}"

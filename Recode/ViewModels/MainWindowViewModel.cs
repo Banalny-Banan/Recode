@@ -18,7 +18,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     Codec _selectedCodec;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(QualityLabel))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(QualityPercentage))]
     int _qualityValue;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(OutputPathTooltip)), NotifyPropertyChangedFor(nameof(StartButtonEnabled))]
@@ -53,15 +53,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _replaceFiles = false;
         _afterCompletionAction = AfterCompletionAction.Nothing;
     }
-
-    public string QualityLabel => QualityValue switch
-    {
-        <= 15 => "Smallest",
-        <= 35 => "Smaller",
-        <= 65 => "Balanced",
-        <= 85 => "High Quality",
-        _ => "Lossless",
-    };
+    
+    public string QualityPercentage => $"{QualityValue}%";
 
     public bool StartButtonEnabled => FfMpegReady && (!string.IsNullOrEmpty(OutputPath) || ReplaceFiles);
 

@@ -16,11 +16,10 @@ public partial class MainWindowViewModel
     readonly ICompressionService? _compressionService;
     CancellationTokenSource? _compressionCts;
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CancelButtonEnabled))]
     bool _isCompressing;
 
-    [ObservableProperty]
-    bool _cancelButtonEnabled;
+    public bool CancelButtonEnabled => IsCompressing;
 
     [RelayCommand]
     async Task StartCompression()
@@ -29,7 +28,6 @@ public partial class MainWindowViewModel
             return;
 
         IsCompressing = true;
-        CancelButtonEnabled = true;
         _compressionCts = new CancellationTokenSource();
         FfMpegOptions options = new(SelectedCodec, QualityValue);
         OutputOptions output = new(OutputPath, ReplaceFiles);
@@ -81,7 +79,6 @@ public partial class MainWindowViewModel
         {
             bool wasCancelled = _compressionCts?.IsCancellationRequested ?? false;
             IsCompressing = false;
-            CancelButtonEnabled = false;
             _compressionCts?.Dispose();
             _compressionCts = null;
 
