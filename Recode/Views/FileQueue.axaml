@@ -13,13 +13,7 @@
     <Border BorderBrush="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppInsetBrush}"
             BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0" DragDrop.AllowDrop="True">
 
-      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="20">
-
-        <controls:SmoothScrollViewer.Styles>
-          <Style Selector="ScrollBar RepeatButton">
-            <Setter Property="IsVisible" Value="False" />
-          </Style>
-        </controls:SmoothScrollViewer.Styles>
+      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="20" VerticalScrollBarVisibility="Hidden">
 
         <DockPanel MinHeight="{Binding $parent[controls:SmoothScrollViewer].Viewport.Height}">
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
@@ -38,7 +32,7 @@
                   </Grid>
                   <ProgressBar Grid.Column="1" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
                   <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="1" VerticalAlignment="Stretch">
+                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch" Margin="0,-2">
                     <StackPanel.Styles>
                       <Style Selector="Button">
                         <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />

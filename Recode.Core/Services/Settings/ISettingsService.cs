@@ -10,5 +10,5 @@ public interface ISettingsService
 
 public record AppSettings(Codec SelectedCodec, int QualityValue, string OutputPath, bool ReplaceFiles, bool UseGpu, AfterCompletionAction AfterCompletionAction)
 {
-    public AppSettings() : this(Codec.H264, 50, "", false, false, AfterCompletionAction.Nothing) { }
+    public AppSettings() : this(Codec.H264, 50, "", false, true, AfterCompletionAction.Nothing) { }
 }

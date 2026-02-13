@@ -8,8 +8,10 @@ namespace Recode.ViewModels;
 
 public partial class QueueItemViewModel : ViewModelBase
 {
-    readonly string _fileSize;
     readonly Action<QueueItemViewModel>? _removeAction;
+
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
+    string _fileSize;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
     double _progress;
@@ -41,7 +43,7 @@ public partial class QueueItemViewModel : ViewModelBase
     public string FilePath { get; }
     public string FileName { get; }
 
-    public string SizeDisplay => ResultSize is null ? _fileSize : $"{_fileSize} → {ResultSize}";
+    public string SizeDisplay => ResultSize is null ? FileSize : $"{FileSize} → {ResultSize}";
 
     public bool CanRetry => Status is QueueItemStatus.Completed or QueueItemStatus.Failed;
 
@@ -51,6 +53,9 @@ public partial class QueueItemViewModel : ViewModelBase
         Progress = 0;
         ResultSize = null;
         Status = QueueItemStatus.Pending;
+
+        if (!string.IsNullOrEmpty(FilePath))
+            FileSize = Formatting.FormatFileSize(new FileInfo(FilePath).Length);
     }
 
     [RelayCommand]

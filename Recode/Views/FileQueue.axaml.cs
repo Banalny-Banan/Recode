@@ -38,14 +38,14 @@ public partial class FileQueue : UserControl
             {
                 QueueItems =
                 {
-                    new("video1.mp4", "1.2 GB", 60, "ETA 2:30"),
-                    new("video2_very_long_video_name_that_will_make_you_bored.mkv", "800 MB", 0, "Pending"),
-                    new("video3.avi", "999 MB → 99.9 MB", 100, "Completed"),
-                    new("video4.mov", "3 GB", 25, "ETA 5:00"),
-                    new("video5.flv", "500 MB", 90, "ETA 0:30"),
-                    new("video6.wmv", "1 GB", 10, "ETA 10:00"),
-                    new("video7.mp4", "700 MB", 75, "ETA 1:00"),
-                    new("video8.mkv", "1.5 GB", 50, "ETA 3:00"),
+                    new("video1.mp4", "1.2 GB", 60, QueueItemStatus.Processing),
+                    new("video2_very_long_video_name_that_will_make_you_bored.mkv", "800 MB", 0, QueueItemStatus.Pending),
+                    new("video3.avi", "999 MB → 99.9 MB", 100, QueueItemStatus.Completed),
+                    new("video4.mov", "3 GB", 25, QueueItemStatus.Failed),
+                    new("video5.flv", "500 MB", 90, QueueItemStatus.Pending),
+                    new("video6.wmv", "1 GB", 10, QueueItemStatus.Pending),
+                    new("video7.mp4", "700 MB", 75, QueueItemStatus.Pending),
+                    new("video8.mkv", "1.5 GB", 50, QueueItemStatus.Pending),
                 },
             };
         }

@@ -18,7 +18,7 @@
       <ColumnDefinition Width="60" />
       <ColumnDefinition Width="3*" />
       <ColumnDefinition Width="8" />
-      <ColumnDefinition Width="2*"  MinWidth="220" />
+      <ColumnDefinition Width="2*" MinWidth="220" />
     </Grid.ColumnDefinitions>
 
     <!-- Codec selector -->
