@@ -12,7 +12,14 @@
     <vm:MainWindowViewModel />
   </Design.DataContext>
 
-  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="60,3*,16,2*" IsEnabled="{Binding !IsCompressing}">
+  <Grid RowDefinitions="Auto,Auto" IsEnabled="{Binding !IsCompressing}">
+
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="60" />
+      <ColumnDefinition Width="3*" />
+      <ColumnDefinition Width="16" />
+      <ColumnDefinition Width="2*"  MinWidth="220" />
+    </Grid.ColumnDefinitions>
 
     <!-- Codec selector -->
     <TextBlock Grid.Row="0" Grid.Column="0" Text="Codec:" VerticalAlignment="Center" />
@@ -30,9 +37,13 @@
     <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding OutputPath}" Watermark="Output folder..." Focusable="False" IsEnabled="{Binding !ReplaceFiles}"
              IsReadOnly="True" Tapped="OutputPath_OnTapped" Cursor="Hand" VerticalAlignment="Center" ToolTip.Tip="{Binding OutputPathTooltip}" />
 
-    <!-- Replace files checkbox -->
-    <CheckBox Grid.Row="1" Grid.Column="3" Content="Replace files" IsChecked="{Binding ReplaceFiles}"
-              VerticalAlignment="Center" ToolTip.Tip="Replace original files instead of compressing to the output folder" />
+    <!-- Replace files + GPU checkboxes -->
+    <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+      <CheckBox Content="Replace files" IsChecked="{Binding ReplaceFiles}"
+                ToolTip.Tip="Replace original files instead of compressing to the output folder" />
+      <CheckBox Content="Use GPU" IsChecked="{Binding UseGpu}" Margin="12,0,0,0"
+                ToolTip.Tip="Use GPU-accelerated encoding for faster compression but slightly increased file size" />
+    </StackPanel>
 
   </Grid>
 </UserControl>

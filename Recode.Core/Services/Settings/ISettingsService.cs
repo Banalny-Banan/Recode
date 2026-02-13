@@ -8,7 +8,7 @@ public interface ISettingsService
     void Save(AppSettings settings);
 }
 
-public record AppSettings(Codec SelectedCodec, int QualityValue, string OutputPath, bool ReplaceFiles, AfterCompletionAction AfterCompletionAction)
+public record AppSettings(Codec SelectedCodec, int QualityValue, string OutputPath, bool ReplaceFiles, bool UseGpu, AfterCompletionAction AfterCompletionAction)
 {
-    public AppSettings() : this(Codec.H264, 50, "", false, AfterCompletionAction.Nothing) { }
+    public AppSettings() : this(Codec.H264, 50, "", false, false, AfterCompletionAction.Nothing) { }
 }

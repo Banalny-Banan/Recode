@@ -14,4 +14,4 @@ public interface IFfMpegService
 }
 
 public record struct FfMpegResult(bool Success, string? ErrorMessage);
-public record struct FfMpegOptions(Codec Codec, int Quality);
+public record struct FfMpegOptions(Codec Codec, int Quality, bool UseGpu);

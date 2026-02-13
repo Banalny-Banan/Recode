@@ -28,6 +28,9 @@ public partial class MainWindowViewModel : ViewModelBase
     bool _replaceFiles;
 
     [ObservableProperty]
+    bool _useGpu;
+
+    [ObservableProperty]
     AfterCompletionAction _afterCompletionAction;
 
     public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, IPowerService powerService, IHistoryService historyService, ISettingsService settingsService)
@@ -42,6 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _qualityValue = settings.QualityValue;
         _outputPath = settings.OutputPath;
         _replaceFiles = settings.ReplaceFiles;
+        _useGpu = settings.UseGpu;
         _afterCompletionAction = settings.AfterCompletionAction;
     }
 

@@ -9,8 +9,9 @@ public partial class MainWindowViewModel
 
     partial void OnSelectedCodecChanged(Codec value) => SaveSettings();
     partial void OnQualityValueChanged(int value) => SaveSettings();
-    partial void OnReplaceFilesChanged(bool value) => SaveSettings();
     partial void OnOutputPathChanged(string value) => SaveSettings();
+    partial void OnReplaceFilesChanged(bool value) => SaveSettings();
+    partial void OnUseGpuChanged(bool value) => SaveSettings();
     partial void OnAfterCompletionActionChanged(AfterCompletionAction value) => SaveSettings();
 
     void SaveSettings()
@@ -18,14 +19,15 @@ public partial class MainWindowViewModel
         if (_settingsService == null)
             return;
 
-        AppSettings settings = new()
-        {
-            SelectedCodec = SelectedCodec,
-            QualityValue = QualityValue,
-            OutputPath = OutputPath,
-            ReplaceFiles = ReplaceFiles,
-            AfterCompletionAction = AfterCompletionAction,
-        };
+        AppSettings settings = new
+        (
+            SelectedCodec,
+            QualityValue,
+            OutputPath,
+            ReplaceFiles,
+            UseGpu,
+            AfterCompletionAction
+        );
 
         _settingsService.Save(settings);
     }

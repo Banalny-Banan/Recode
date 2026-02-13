@@ -30,7 +30,7 @@ public partial class MainWindowViewModel
 
         IsCompressing = true;
         _compressionCts = new CancellationTokenSource();
-        FfMpegOptions options = new(SelectedCodec, QualityValue);
+        FfMpegOptions options = new(SelectedCodec, QualityValue, UseGpu);
         OutputOptions output = new(OutputPath, ReplaceFiles);
 
         try

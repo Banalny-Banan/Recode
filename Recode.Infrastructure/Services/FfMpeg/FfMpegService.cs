@@ -9,6 +9,7 @@ namespace Recode.Infrastructure.Services.FfMpeg;
 public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegService
 {
     readonly string _ffmpegPath = ffmpegManager.FfmpegPath;
+    HashSet<string>? _availableEncoders;
 
     public async Task<FfMpegResult> CompressAsync
     (
@@ -20,6 +21,9 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
     {
         try
         {
+            if (options.UseGpu)
+                await EnsureEncodersCached(cancellationToken);
+
             TimeSpan duration = await ProbeDurationAsync(inputPath, cancellationToken);
 
             if (duration <= TimeSpan.Zero)
@@ -80,10 +84,11 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         return duration;
     }
 
-    static string[] BuildArguments(string inputPath, string outputPath, FfMpegOptions options)
+    string[] BuildArguments(string inputPath, string outputPath, FfMpegOptions options)
     {
         int crf = CalculateCrf(options.Codec, options.Quality);
-        string encoder = GetEncoder(options.Codec);
+        string? gpuEncoder = options.UseGpu ? FindGpuEncoder(options.Codec) : null;
+        string encoder = gpuEncoder ?? GetSoftwareEncoder(options.Codec);
 
         List<string> args =
         [
@@ -91,14 +96,21 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
             "-nostdin", // don't read from stdin (prevents hanging)
             "-i", inputPath,
             "-c:v", encoder,
-            "-crf", crf.ToString(),
         ];
 
-        // VP9 and AV1 require -b:v 0 for CRF mode
-        if (options.Codec is Codec.Vp9 or Codec.Av1)
+        if (gpuEncoder != null)
+            AddGpuQualityArgs(args, gpuEncoder, crf);
+        else
         {
-            args.Add("-b:v");
-            args.Add("0");
+            args.Add("-crf");
+            args.Add(crf.ToString());
+
+            // VP9 and AV1 require -b:v 0 for CRF mode
+            if (options.Codec is Codec.Vp9 or Codec.Av1)
+            {
+                args.Add("-b:v");
+                args.Add("0");
+            }
         }
 
         args.Add("-c:a");
@@ -108,7 +120,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         return args.ToArray();
     }
 
-    static string GetEncoder(Codec codec) => codec switch
+    static string GetSoftwareEncoder(Codec codec) => codec switch
     {
         Codec.H264 => "libx264",
         Codec.H265 => "libx265",
@@ -116,6 +128,84 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         Codec.Av1 => "libaom-av1",
         _ => throw new ArgumentOutOfRangeException(nameof(codec)),
     };
+
+    // GPU encoders ordered by priority: NVENC > AMF > QSV
+    static readonly (string encoder, string vendor)[][] GpuEncoders =
+    [
+        // H.264
+        [("h264_nvenc", "nvenc"), ("h264_amf", "amf"), ("h264_qsv", "qsv")],
+        // H.265
+        [("hevc_nvenc", "nvenc"), ("hevc_amf", "amf"), ("hevc_qsv", "qsv")],
+        // VP9 — no GPU encoders
+        [],
+        // AV1
+        [("av1_nvenc", "nvenc"), ("av1_amf", "amf"), ("av1_qsv", "qsv")],
+    ];
+
+    string? FindGpuEncoder(Codec codec)
+    {
+        if (_availableEncoders is null)
+            return null;
+
+        var candidates = GpuEncoders[(int)codec];
+
+        foreach ((string encoder, _) in candidates)
+        {
+            if (_availableEncoders.Contains(encoder))
+                return encoder;
+        }
+
+        return null;
+    }
+
+    static void AddGpuQualityArgs(List<string> args, string encoder, int crf)
+    {
+        if (encoder.Contains("nvenc"))
+        {
+            args.Add("-cq");
+            args.Add(crf.ToString());
+        }
+        else if (encoder.Contains("amf"))
+        {
+            args.Add("-rc");
+            args.Add("cqp");
+            args.Add("-qp_i");
+            args.Add(crf.ToString());
+            args.Add("-qp_p");
+            args.Add(crf.ToString());
+        }
+        else if (encoder.Contains("qsv"))
+        {
+            args.Add("-global_quality");
+            args.Add(crf.ToString());
+        }
+    }
+
+    async Task EnsureEncodersCached(CancellationToken cancellationToken)
+    {
+        if (_availableEncoders != null)
+            return;
+
+        var encoders = new HashSet<string>(StringComparer.Ordinal);
+
+        await Cli.Wrap(_ffmpegPath)
+            .WithArguments(["-encoders", "-hide_banner"])
+            .WithValidation(CommandResultValidation.None)
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(line =>
+            {
+                // Lines look like: " V..... h264_nvenc  NVIDIA NVENC H.264 encoder (codec h264)"
+                string trimmed = line.TrimStart();
+                if (!trimmed.StartsWith("V"))
+                    return;
+
+                string[] parts = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                    encoders.Add(parts[1]);
+            }))
+            .ExecuteAsync(cancellationToken);
+
+        _availableEncoders = encoders;
+    }
 
     static int CalculateCrf(Codec codec, int quality)
     {
