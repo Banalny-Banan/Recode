@@ -5,6 +5,9 @@ using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Recode.Core.Services;
+using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.Settings;
 using Recode.ViewModels;
 using Recode.Views;
 
@@ -31,9 +34,9 @@ public partial class App : Application
             // Register ViewModels
             services.AddSingleton<MainWindowViewModel>();
 
-            // Register services (empty for now, we'll add them as we build them)
-            // services.AddSingleton<ISettingsService, SettingsService>();
-            // services.AddSingleton<IFfmpegManager, FfmpegManager>();
+            // Register services
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<IFfmpegManager, FfmpegManager>();
 
             // Build the factory
             ServiceProvider provider = services.BuildServiceProvider();

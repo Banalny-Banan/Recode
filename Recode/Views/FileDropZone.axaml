@@ -3,21 +3,35 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Recode.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="120"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="67"
              x:Class="Recode.Views.FileDropZone"
              x:DataType="vm:MainWindowViewModel">
 
-  <!-- Panel layers children on top of each other; Rectangle provides the dashed border -->
-  <Panel DragDrop.AllowDrop="True" Background="Transparent">
-    <Rectangle Stroke="{DynamicResource AppBorderBrush}"
-               StrokeThickness="2" StrokeDashArray="2,2"
-               RadiusX="8" RadiusY="8" />
-    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
-                Spacing="8" Margin="24">
-      <TextBlock Text="Drag &amp; drop video files here"
-                 HorizontalAlignment="Center" Opacity="0.6" />
-      <Button Content="Browse Files" HorizontalAlignment="Center" Click="BrowseButton_OnClick"/>
-    </StackPanel>
-  </Panel>
+  <Button DragDrop.AllowDrop="True" Click="BrowseButton_OnClick"
+          HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+          VerticalContentAlignment="Center" Padding="24" Cursor="Hand">
+    <Button.Template>
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <Rectangle x:Name="Border"
+                     Stroke="{DynamicResource AppBorderBrush}"
+                     StrokeThickness="2" StrokeDashArray="2,2"
+                     RadiusX="8" RadiusY="8" />
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}" />
+        </Panel>
+      </ControlTemplate>
+    </Button.Template>
+    <Button.Styles>
+      <Style Selector="Button:pointerover /template/ Rectangle#Border">
+        <Setter Property="Stroke" Value="{DynamicResource AppTextSecondaryBrush}" />
+      </Style>
+      <Style Selector="Button:pressed /template/ Rectangle#Border">
+        <Setter Property="Stroke" Value="{DynamicResource AppTextPrimaryBrush}" />
+      </Style>
+    </Button.Styles>
+    <TextBlock Text="Drag &amp; drop or click to browse"
+               HorizontalAlignment="Center" Opacity="0.6" />
+  </Button>
 
 </UserControl>

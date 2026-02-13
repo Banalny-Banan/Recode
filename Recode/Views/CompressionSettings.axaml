@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Recode.ViewModels"
+             xmlns:controls="clr-namespace:Recode.Controls"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="70"
+             x:Class="Recode.Views.CompressionSettings"
+             x:DataType="vm:MainWindowViewModel">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel />
+  </Design.DataContext>
+
+  <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="60,3*,16,2*">
+
+    <!-- Codec selector -->
+    <TextBlock Grid.Row="0" Grid.Column="0" Text="Codec:" VerticalAlignment="Center" />
+    <controls:EnumSelector Grid.Row="0" Grid.Column="1" SelectedValue="{Binding SelectedCodec}" Mode="List" />
+
+    <!-- Quality slider -->
+    <TextBlock Grid.Row="1" Grid.Column="0" Text="Quality:" VerticalAlignment="Center" />
+    <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100" Value="{Binding QualityValue}" VerticalAlignment="Center" ToolTip.Tip="{Binding QualityLabel}" />
+
+    <!-- Output path selector -->
+    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding OutputPath}" Watermark="Output folder..." Focusable="False" IsEnabled="{Binding !ReplaceFiles}"
+             IsReadOnly="True" Tapped="OutputPath_OnTapped" Cursor="Hand" VerticalAlignment="Center" ToolTip.Tip="{Binding OutputPathTooltip}" />
+
+    <!-- Replace files checkbox -->
+    <CheckBox Grid.Row="1" Grid.Column="3" Content="Replace files" IsChecked="{Binding ReplaceFiles}"
+              VerticalAlignment="Center" ToolTip.Tip="Replace original files instead of compressing to the output folder" />
+
+  </Grid>
+</UserControl>

@@ -39,5 +39,8 @@
       <Compile Update="Controls\EnumSelector.axaml.cs">
         <DependentUpon>EnumSelector.axaml</DependentUpon>
       </Compile>
+      <Compile Update="ViewModels\MainWindowViewModel.Settings.cs">
+        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 </Project>
