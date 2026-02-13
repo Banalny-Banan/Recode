@@ -1,5 +1,8 @@
 using System;
 using System.IO;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Recode.Core.Utility;
@@ -16,8 +19,8 @@ public partial class QueueItemViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
     double _progress;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
-    string _status = QueueItemStatus.Pending;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry), nameof(ProgressBarBrush))]
+    QueueItemStatus _status = QueueItemStatus.Pending;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
     string? _resultSize;
@@ -31,7 +34,7 @@ public partial class QueueItemViewModel : ViewModelBase
         _removeAction = removeAction;
     }
 
-    internal QueueItemViewModel(string fileName, string fileSize, double progress, string status)
+    internal QueueItemViewModel(string fileName, string fileSize, double progress, QueueItemStatus status)
     {
         FilePath = "";
         FileName = fileName;
@@ -46,6 +49,23 @@ public partial class QueueItemViewModel : ViewModelBase
     public string SizeDisplay => ResultSize is null ? FileSize : $"{FileSize} → {ResultSize}";
 
     public bool CanRetry => Status is QueueItemStatus.Completed or QueueItemStatus.Failed;
+
+    public IBrush ProgressBarBrush
+    {
+        get
+        {
+            if (Status == QueueItemStatus.Failed)
+            {
+                return Application.Current?.TryFindResource("SystemFillColorCriticalBrush", out object? resource) == true
+                    ? resource as IBrush ?? Brushes.Crimson
+                    : Brushes.Crimson;
+            }
+
+            return Application.Current?.TryFindResource("SystemAccentColor", out object? accent) == true
+                ? accent as IBrush ?? Brushes.DodgerBlue
+                : Brushes.DodgerBlue;
+        }
+    }
 
     [RelayCommand]
     void Retry()
@@ -62,10 +82,10 @@ public partial class QueueItemViewModel : ViewModelBase
     void Remove() => _removeAction?.Invoke(this);
 }
 
-public static class QueueItemStatus
+public enum QueueItemStatus
 {
-    public const string Pending = "Pending";
-    public const string Processing = "Processing";
-    public const string Completed = "Completed";
-    public const string Failed = "Failed";
+    Pending,
+    Processing,
+    Completed,
+    Failed,
 }

@@ -70,7 +70,7 @@ public partial class MainWindowViewModel
                 }
                 else
                 {
-                    item.Progress = 0;
+                    item.Progress = Math.Max(item.Progress, 5);
                     item.Status = QueueItemStatus.Failed;
                     Debug.WriteLine($"Compression failed for {item.FilePath}: {result.ErrorMessage}");
                 }
