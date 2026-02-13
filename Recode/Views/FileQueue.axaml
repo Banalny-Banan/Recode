@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Recode.ViewModels"
+             xmlns:controls="clr-namespace:Recode.Controls"
              mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="92"
              x:Class="Recode.Views.FileQueue"
              x:DataType="vm:MainWindowViewModel">
@@ -12,31 +13,32 @@
     <Border BorderBrush="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppInsetBrush}"
             BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0" DragDrop.AllowDrop="True">
 
-      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="20">
 
-        <ScrollViewer.Styles>
+        <controls:SmoothScrollViewer.Styles>
           <Style Selector="ScrollBar RepeatButton">
             <Setter Property="IsVisible" Value="False" />
           </Style>
-        </ScrollViewer.Styles>
+        </controls:SmoothScrollViewer.Styles>
 
-        <DockPanel MinHeight="{Binding $parent[ScrollViewer].Viewport.Height}">
+        <DockPanel MinHeight="{Binding $parent[controls:SmoothScrollViewer].Viewport.Height}">
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:QueueItemViewModel">
                 <Grid Margin="8,4" ColumnSpacing="4">
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="Auto" MinWidth="150" SharedSizeGroup="Size" />
                     <ColumnDefinition Width="*" MaxWidth="200" />
                     <ColumnDefinition Width="74" />
                     <ColumnDefinition Width="Auto" />
                   </Grid.ColumnDefinitions>
-                  <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" />
-                  <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                  <ProgressBar Grid.Column="2" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
-                  <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                  <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch">
+                  <Grid Grid.Column="0" ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0" />
+                  </Grid>
+                  <ProgressBar Grid.Column="1" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
+                  <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch">
                     <Button Content="↻" Width="28" Padding="0" FontSize="14"
                             Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry"
                             VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
@@ -63,7 +65,7 @@
 
         </DockPanel>
 
-      </ScrollViewer>
+      </controls:SmoothScrollViewer>
 
     </Border>
 
