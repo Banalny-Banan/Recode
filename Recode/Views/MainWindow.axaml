@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:Recode.Views"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="375"
-        Width="600" Height="370" MinWidth="600" MinHeight="375"
+        Width="600" Height="375" MinWidth="600" MinHeight="270"
         x:Class="Recode.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
