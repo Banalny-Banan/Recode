@@ -10,16 +10,18 @@
   <Grid RowDefinitions="*,Auto" RowSpacing="4">
 
     <Border BorderBrush="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppInsetBrush}"
-            BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0">
+            BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0" DragDrop.AllowDrop="True">
 
-      <Panel>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled">
 
-        <TextBlock Text="No files selected" HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Foreground="{DynamicResource AppTextDisabledBrush}"
-                   IsVisible="{Binding !QueueItems.Count}" />
+        <ScrollViewer.Styles>
+          <Style Selector="ScrollBar RepeatButton">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+        </ScrollViewer.Styles>
 
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
-          <ItemsControl ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
+        <DockPanel MinHeight="{Binding $parent[ScrollViewer].Viewport.Height}">
+          <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:QueueItemViewModel">
                 <Grid Margin="8,4" ColumnSpacing="4">
@@ -37,9 +39,22 @@
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
-        </ScrollViewer>
 
-      </Panel>
+          <TextBlock x:Name="BrowseText" Text="Drop files here or click to browse" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Cursor="Hand" PointerPressed="BrowseButton_OnClick" Margin="0,0,0,6">
+            <TextBlock.Styles>
+              <Style Selector="TextBlock#BrowseText">
+                <Setter Property="Foreground" Value="{DynamicResource AppTextDisabledBrush}" />
+              </Style>
+              <Style Selector="TextBlock#BrowseText:pointerover">
+                <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
+              </Style>
+            </TextBlock.Styles>
+          </TextBlock>
+
+        </DockPanel>
+
+      </ScrollViewer>
 
     </Border>
 

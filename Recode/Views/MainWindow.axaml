@@ -21,14 +21,13 @@
   </Design.DataContext>
 
   <Panel>
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="16">
-      <views:FileDropZone Grid.Row="0" Margin="0,0,0,16" />
-      <views:CompressionSettings Grid.Row="1" />
-      <views:FileQueue Grid.Row="2" />
-      <views:ControlBar Grid.Row="3" Margin="0,8,0,0" />
+    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="16">
+      <views:CompressionSettings Grid.Row="0" />
+      <views:FileQueue Grid.Row="1" />
+      <views:ControlBar Grid.Row="2" Margin="0,8,0,0" />
 
       <!-- FFmpeg download status (visible when not ready) -->
-      <StackPanel Grid.Row="4" Spacing="8" Margin="0,16,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
+      <StackPanel Grid.Row="3" Spacing="8" Margin="0,16,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
                   IsVisible="{Binding !FfMpegReady}">
         <TextBlock Text="Downloading FFmpeg..." VerticalAlignment="Center" />
         <ProgressBar Value="{Binding FfMpegDownloadProgress}" Maximum="100" Width="300" />
