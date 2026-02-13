@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Recode.Core;
+namespace Recode.Core.Enums;
 
 [AttributeUsage(AttributeTargets.Field)]
 public class TooltipAttribute(string text) : Attribute

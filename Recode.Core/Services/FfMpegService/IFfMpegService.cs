@@ -1,3 +1,5 @@
+using Recode.Core.Enums;
+
 namespace Recode.Core.Services.FfMpegService;
 
 public interface IFfMpegService

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Recode.Core;
+namespace Recode.Core.Enums;
 
 public enum AfterCompletionAction
 {

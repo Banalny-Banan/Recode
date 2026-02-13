@@ -1,4 +1,4 @@
-using Recode.Core;
+using Recode.Core.Enums;
 using Recode.Core.Services.Settings;
 
 namespace Recode.ViewModels;

@@ -1,6 +1,6 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Recode.Core;
+using Recode.Core.Utility;
 
 namespace Recode.ViewModels;
 

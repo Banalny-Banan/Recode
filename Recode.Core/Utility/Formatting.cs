@@ -1,4 +1,4 @@
-namespace Recode.Core;
+namespace Recode.Core.Utility;
 
 public static class Formatting
 {

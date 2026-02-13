@@ -1,3 +1,5 @@
+using Recode.Core.Enums;
+
 namespace Recode.Core.Services.Settings;
 
 public interface ISettingsService
