@@ -168,12 +168,12 @@ public partial class MainWindowViewModel : ViewModelBase
     QueueItemViewModel? NextPendingItem()
         => QueueItems.FirstOrDefault(item => item.Status == QueueItemStatus.Pending);
 
-    public async Task<(bool Success, string? Message)> InitializeFfmpeg()
+    public async Task<(bool Success, string? Message, string? FfMpegRequiredPath)> InitializeFfmpeg()
     {
         if (_ffmpegManager is null)
         {
             FfMpegReady = true;
-            return (true, null);
+            return (true, null, null);
         }
 
         Progress<double> progressReporter = new(p => FfMpegDownloadProgress = p);
@@ -182,10 +182,10 @@ public partial class MainWindowViewModel : ViewModelBase
         if (success)
         {
             FfMpegReady = true;
-            return (true, null);
+            return (true, null, null);
         }
 
         FfMpegReady = false;
-        return (false, message);
+        return (false, message, _ffmpegManager.FfmpegPath);
     }
 }

@@ -28,7 +28,7 @@ public class FfmpegManager : IFfmpegManager
             );
 
             if (!response.IsSuccessStatusCode)
-                return (false, $"Failed to download ffmpeg: {response.ReasonPhrase}");
+                return (false, response.ReasonPhrase);
 
             long totalBytes = response.Content.Headers.ContentLength ?? -1;
             long bytesRead = 0;
@@ -63,7 +63,7 @@ public class FfmpegManager : IFfmpegManager
         }
         catch (Exception ex)
         {
-            return (false, $"Failed to download ffmpeg: {ex.Message}");
+            return (false, $"Unhandled exception: {ex.Message}");
         }
         finally
         {

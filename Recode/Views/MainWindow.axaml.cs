@@ -20,7 +20,7 @@ public partial class MainWindow : Window
         {
             if (DataContext is not MainWindowViewModel vm) return;
 
-            var (success, message) = await vm.InitializeFfmpeg();
+            var (success, message, path) = await vm.InitializeFfmpeg();
 
             if (!success)
             {
@@ -28,10 +28,11 @@ public partial class MainWindow : Window
                 {
                     Title = "FFmpeg Required",
                     Width = 400, Height = 150,
+                    CanResize = false,
                     WindowStartupLocation = WindowStartupLocation.CenterOwner,
                     Content = new TextBlock
                     {
-                        Text = $"Failed to download FFmpeg:\n{message}\n\nPlease place ffmpeg.exe next to the application.",
+                        Text = $"Failed to download FFmpeg:\n{message}\n\nTry again or download and place ffmpeg.exe in {path}.",
                         TextWrapping = TextWrapping.Wrap,
                         Margin = new Thickness(16),
                         VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
