@@ -5,9 +5,10 @@ namespace Recode.Infrastructure.Services.FfmpegManager;
 
 public class FfmpegManager : IFfmpegManager
 {
-    public string FfmpegPath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
+    public string FfmpegPath { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Recode", "ffmpeg.exe");
 
-    public async Task<(bool Success, string? Message)> EnsureAvailableAsync(IProgress<double> progress)
+    public async Task<(bool Success, string? Message)> EnsureAvailableAsync(IProgress<double> progress, CancellationToken cancellationToken = default)
     {
         var tempZip = string.Empty;
 
@@ -22,7 +23,8 @@ public class FfmpegManager : IFfmpegManager
             using HttpResponseMessage response = await client.GetAsync
             (
                 "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
-                HttpCompletionOption.ResponseHeadersRead
+                HttpCompletionOption.ResponseHeadersRead,
+                cancellationToken
             );
 
             if (!response.IsSuccessStatusCode)
@@ -32,14 +34,14 @@ public class FfmpegManager : IFfmpegManager
             long bytesRead = 0;
 
             await using FileStream fileStream = File.Create(tempZip);
-            await using Stream contentStream = await response.Content.ReadAsStreamAsync();
+            await using Stream contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             var buffer = new byte[81920];
             int read;
 
-            while ((read = await contentStream.ReadAsync(buffer)) > 0)
+            while ((read = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)
             {
-                await fileStream.WriteAsync(buffer.AsMemory(0, read));
+                await fileStream.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
                 bytesRead += read;
 
                 if (totalBytes > 0)

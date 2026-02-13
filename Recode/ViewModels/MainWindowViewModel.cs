@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Recode.Core;
+using Recode.Core.Services.Compression;
 using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.FfMpegService;
 using Recode.Core.Services.Settings;
 
 namespace Recode.ViewModels;
@@ -14,9 +17,14 @@ namespace Recode.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     readonly IFfmpegManager? _ffmpegManager;
+    readonly ICompressionService? _compressionService;
+    CancellationTokenSource? _compressionCts;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(StartButtonEnabled))]
     bool _ffMpegReady;
+
+    [ObservableProperty]
+    bool _isCompressing;
 
     [ObservableProperty]
     Codec _selectedCodec;
@@ -39,9 +47,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     double _ffMpegDownloadProgress;
 
-    public MainWindowViewModel(IFfmpegManager ffmpegManager, ISettingsService settingsService)
+    public MainWindowViewModel(IFfmpegManager ffmpegManager, ICompressionService compressionService, ISettingsService settingsService)
     {
         _ffmpegManager = ffmpegManager;
+        _compressionService = compressionService;
         _settingsService = settingsService;
         AppSettings settings = _settingsService.Load();
         _selectedCodec = settings.SelectedCodec;
@@ -92,14 +101,70 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     async Task StartCompression()
     {
-        // start compression of all items in queue
+        if (_compressionService is null || IsCompressing)
+            return;
+
+        IsCompressing = true;
+        CancelButtonEnabled = true;
+        _compressionCts = new CancellationTokenSource();
+        CompressionOptions options = new(SelectedCodec, QualityValue);
+        OutputOptions output = new(OutputPath, ReplaceFiles);
+
+        try
+        {
+            while (NextPendingItem() is { } item)
+            {
+                item.Status = QueueItemStatus.Processing;
+
+                Progress<double> progress = new(p =>
+                {
+                    item.Progress = p;
+                    OnPropertyChanged(nameof(OverallProgress));
+                });
+
+                CompressionResult result = await _compressionService.CompressFileAsync(
+                    item.FilePath, options, output, progress, _compressionCts.Token);
+
+                if (result.Success)
+                {
+                    item.Progress = 100;
+                    item.Status = QueueItemStatus.Completed;
+                }
+                else
+                {
+                    item.Progress = 0;
+                    
+                    if (_compressionCts.IsCancellationRequested)
+                    {
+                        item.Status = QueueItemStatus.Pending;
+                    }
+                    else
+                    {
+                        item.Status = QueueItemStatus.Failed;
+                    }
+                }
+
+                OnPropertyChanged(nameof(OverallProgress));
+
+                if (_compressionCts.IsCancellationRequested)
+                    break;
+            }
+        }
+        finally
+        {
+            IsCompressing = false;
+            CancelButtonEnabled = false;
+            _compressionCts?.Dispose();
+            _compressionCts = null;
+        }
     }
 
     [RelayCommand]
-    async Task CancelCompression()
-    {
-        // clear all items from queue
-    }
+    void CancelCompression()
+        => _compressionCts?.Cancel();
+
+    QueueItemViewModel? NextPendingItem()
+        => QueueItems.FirstOrDefault(item => item.Status == QueueItemStatus.Pending);
 
     public async Task<(bool Success, string? Message)> InitializeFfmpeg()
     {

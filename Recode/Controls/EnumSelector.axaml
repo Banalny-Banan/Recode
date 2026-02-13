@@ -25,14 +25,14 @@
       </ListBox.ItemsPanel>
       <ListBox.ItemTemplate>
         <DataTemplate>
-          <TextBlock Text="{Binding DisplayName}" />
+          <TextBlock Text="{Binding DisplayName}" ToolTip.Tip="{Binding Tooltip}" />
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
     <ComboBox x:Name="ItemsComboBox" IsVisible="False">
       <ComboBox.ItemTemplate>
         <DataTemplate>
-          <TextBlock Text="{Binding DisplayName}" />
+          <TextBlock Text="{Binding DisplayName}" ToolTip.Tip="{Binding Tooltip}" />
         </DataTemplate>
       </ComboBox.ItemTemplate>
     </ComboBox>

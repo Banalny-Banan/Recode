@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
+using Recode.Core;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -35,7 +36,7 @@ public partial class EnumSelector : UserControl
 
         if (Design.IsDesignMode)
         {
-            var designItems = new[] { new EnumItem(0, "Item 1"), new EnumItem(1, "Item 2"), new EnumItem(2, "Item 3"), new EnumItem(3, "Item 4") };
+            var designItems = new[] { new EnumItem(0, "Item 1", null), new EnumItem(1, "Item 2", null), new EnumItem(2, "Item 3", null), new EnumItem(3, "Item 4", null) };
             ItemsListBox.ItemsSource = designItems;
             ItemsComboBox.ItemsSource = designItems;
         }
@@ -104,13 +105,14 @@ public partial class EnumSelector : UserControl
         {
             var name = value.ToString()!;
             FieldInfo? field = enumType.GetField(name);
-            var attr = field?.GetCustomAttribute<DescriptionAttribute>();
-            _items.Add(new EnumItem(value, attr?.Description ?? name));
+            var descAttr = field?.GetCustomAttribute<DescriptionAttribute>();
+            var tooltipAttr = field?.GetCustomAttribute<TooltipAttribute>();
+            _items.Add(new EnumItem(value, descAttr?.Description ?? name, tooltipAttr?.Text));
         }
 
         ItemsListBox.ItemsSource = _items;
         ItemsComboBox.ItemsSource = _items;
     }
 
-    record EnumItem(object Value, string DisplayName);
+    record EnumItem(object Value, string DisplayName, string? Tooltip);
 }

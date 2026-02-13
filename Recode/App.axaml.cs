@@ -6,9 +6,13 @@ using System.Linq;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Recode.Core.Services;
+using Recode.Core.Services.Compression;
 using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.FfMpegService;
 using Recode.Core.Services.Settings;
+using Recode.Infrastructure.Services.Compression;
 using Recode.Infrastructure.Services.FfmpegManager;
+using Recode.Infrastructure.Services.FfMpegService;
 using Recode.Infrastructure.Services.Settings;
 using Recode.ViewModels;
 using Recode.Views;
@@ -39,6 +43,8 @@ public partial class App : Application
             // Register services
             services.AddSingleton<ISettingsService, SettingsService>();
             services.AddSingleton<IFfmpegManager, FfmpegManager>();
+            services.AddSingleton<IFfMpegService, FfMpegService>();
+            services.AddSingleton<ICompressionService, CompressionService>();
 
             // Build the factory
             ServiceProvider provider = services.BuildServiceProvider();
