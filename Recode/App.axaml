@@ -1,8 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Recode.App"
-             xmlns:local="using:Recode"
-             RequestedThemeVariant="Dark">
+             xmlns:local="using:Recode">
 
   <Application.Resources>
     <ResourceDictionary>
@@ -59,11 +58,6 @@
     <Style Selector="Window">
       <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
     </Style>
-    <FluentTheme>
-      <FluentTheme.Palettes>
-        <ColorPaletteResources x:Key="Light" Accent="#FF005FB8" />
-        <ColorPaletteResources x:Key="Dark" Accent="#FF4CC2FF" />
-      </FluentTheme.Palettes>
-    </FluentTheme>
+    <FluentTheme />
   </Application.Styles>
 </Application>
