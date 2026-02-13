@@ -30,11 +30,20 @@
                     <ColumnDefinition Width="Auto" MinWidth="150" SharedSizeGroup="Size" />
                     <ColumnDefinition Width="*" MaxWidth="200" />
                     <ColumnDefinition Width="74" />
+                    <ColumnDefinition Width="Auto" />
                   </Grid.ColumnDefinitions>
                   <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" />
                   <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" />
-                  <ProgressBar Grid.Column="2" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" />
+                  <ProgressBar Grid.Column="2" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
                   <TextBlock Grid.Column="3" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                  <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch">
+                    <Button Content="↻" Width="28" Padding="0" FontSize="14"
+                            Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry"
+                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                    <Button Content="✕" Width="28" Padding="0" FontSize="14"
+                            Command="{Binding RemoveCommand}" ToolTip.Tip="Remove"
+                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                  </StackPanel>
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>

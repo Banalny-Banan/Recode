@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Recode.Core.Utility;
 
 namespace Recode.ViewModels;
@@ -7,22 +9,24 @@ namespace Recode.ViewModels;
 public partial class QueueItemViewModel : ViewModelBase
 {
     readonly string _fileSize;
+    readonly Action<QueueItemViewModel>? _removeAction;
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
     double _progress;
 
-    [ObservableProperty]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
     string _status = QueueItemStatus.Pending;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
     string? _resultSize;
 
-    public QueueItemViewModel(string filePath)
+    public QueueItemViewModel(string filePath, Action<QueueItemViewModel> removeAction)
     {
         FileInfo info = new(filePath);
         FilePath = filePath;
         FileName = info.Name;
         _fileSize = Formatting.FormatFileSize(info.Length);
+        _removeAction = removeAction;
     }
 
     internal QueueItemViewModel(string fileName, string fileSize, double progress, string status)
@@ -38,6 +42,19 @@ public partial class QueueItemViewModel : ViewModelBase
     public string FileName { get; }
 
     public string SizeDisplay => ResultSize is null ? _fileSize : $"{_fileSize} → {ResultSize}";
+
+    public bool CanRetry => Status is QueueItemStatus.Completed or QueueItemStatus.Failed;
+
+    [RelayCommand]
+    void Retry()
+    {
+        Progress = 0;
+        ResultSize = null;
+        Status = QueueItemStatus.Pending;
+    }
+
+    [RelayCommand]
+    void Remove() => _removeAction?.Invoke(this);
 }
 
 public static class QueueItemStatus

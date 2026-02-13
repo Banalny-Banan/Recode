@@ -15,6 +15,7 @@ public partial class MainWindowViewModel
 {
     readonly ICompressionService? _compressionService;
     CancellationTokenSource? _compressionCts;
+    CancellationTokenSource? _currentItemCts;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(CancelButtonEnabled))]
     bool _isCompressing;
@@ -37,6 +38,7 @@ public partial class MainWindowViewModel
             while (NextPendingItem() is { } item)
             {
                 item.Status = QueueItemStatus.Processing;
+                _currentItemCts = CancellationTokenSource.CreateLinkedTokenSource(_compressionCts.Token);
 
                 Progress<double> progress = new(p =>
                 {
@@ -45,7 +47,14 @@ public partial class MainWindowViewModel
                 });
 
                 CompressionResult result = await _compressionService.CompressFileAsync(
-                    item.FilePath, options, output, progress, _compressionCts.Token);
+                    item.FilePath, options, output, progress, _currentItemCts.Token);
+
+                _currentItemCts.Dispose();
+                _currentItemCts = null;
+
+                // Item was removed during processing — skip to next
+                if (!QueueItems.Contains(item))
+                    continue;
 
                 if (result.Success)
                 {
@@ -54,19 +63,16 @@ public partial class MainWindowViewModel
                     item.Status = QueueItemStatus.Completed;
                     _historyService?.RecordCompressed(result.OutputPath);
                 }
+                else if (_compressionCts.IsCancellationRequested)
+                {
+                    item.Progress = 0;
+                    item.Status = QueueItemStatus.Pending;
+                }
                 else
                 {
                     item.Progress = 0;
-
-                    if (_compressionCts.IsCancellationRequested)
-                    {
-                        item.Status = QueueItemStatus.Pending;
-                    }
-                    else
-                    {
-                        item.Status = QueueItemStatus.Failed;
-                        Debug.WriteLine($"Compression failed for {item.FilePath}: {result.ErrorMessage}");
-                    }
+                    item.Status = QueueItemStatus.Failed;
+                    Debug.WriteLine($"Compression failed for {item.FilePath}: {result.ErrorMessage}");
                 }
 
                 OnPropertyChanged(nameof(OverallProgress));
