@@ -109,86 +109,18 @@ public partial class FileQueue : UserControl
 
         if (alreadyCompressed.Count > 0)
         {
-            bool addAll = await ShowAlreadyProcessedDialog(alreadyCompressed.Count, paths.Count);
+            string message = alreadyCompressed.Count == paths.Count
+                ? alreadyCompressed.Count == 1
+                    ? "This file has already been compressed. Add it anyway?"
+                    : $"All {alreadyCompressed.Count} files have already been compressed. Add them anyway?"
+                : $"{alreadyCompressed.Count} of {paths.Count} files have already been compressed. Add them anyway?";
+
+            bool addAll = await AppDialog.AskYesNo("Already Compressed", message);
 
             if (!addAll)
                 paths = paths.Except(alreadyCompressed).ToList();
         }
 
         vm.AddFiles(paths);
-    }
-
-    async Task<bool> ShowAlreadyProcessedDialog(int processedCount, int totalCount)
-    {
-        if (TopLevel.GetTopLevel(this) is not Window owner)
-            return true;
-
-        var result = false;
-
-        string message = processedCount == totalCount
-            ? processedCount == 1
-                ? "This file has already been compressed. Add it anyway?"
-                : $"All {processedCount} files have already been compressed. Add them anyway?"
-            : $"{processedCount} of {totalCount} files have already been compressed. Add them anyway?";
-
-        Window dialog = new()
-        {
-            Title = "Already Compressed",
-            Width = 400, Height = 150,
-            CanResize = false,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            Content = new StackPanel
-            {
-                Margin = new Avalonia.Thickness(16),
-                Spacing = 16,
-                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-                Children =
-                {
-                    new TextBlock
-                    {
-                        Text = message,
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-                    },
-                    new StackPanel
-                    {
-                        Orientation = Avalonia.Layout.Orientation.Horizontal,
-                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
-                        Spacing = 8,
-                        Children =
-                        {
-                            new Button
-                            {
-                                Content = "Yes",
-                                MinWidth = 80,
-                            },
-                            new Button
-                            {
-                                Content = "No",
-                                MinWidth = 80,
-                            },
-                        },
-                    },
-                },
-            },
-        };
-
-        var buttonPanel = (StackPanel)((StackPanel)dialog.Content).Children[1];
-        var yesButton = (Button)buttonPanel.Children[0];
-        var noButton = (Button)buttonPanel.Children[1];
-
-        yesButton.Click += (_, _) =>
-        {
-            result = true;
-            dialog.Close();
-        };
-
-        noButton.Click += (_, _) =>
-        {
-            result = false;
-            dialog.Close();
-        };
-
-        await dialog.ShowDialog(owner);
-        return result;
     }
 }

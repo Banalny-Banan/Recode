@@ -51,5 +51,8 @@
         <Compile Update="ViewModels\MainWindowViewModel.Compression.cs">
           <DependentUpon>MainWindowViewModel.cs</DependentUpon>
         </Compile>
+        <Compile Update="Views\AppDialog.axaml.cs">
+          <DependentUpon>AppDialog.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>

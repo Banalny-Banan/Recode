@@ -9,40 +9,23 @@
         x:Class="Recode.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Recode"
-        RequestedThemeVariant="Dark">
-
-  <Window.Background>
-    <DynamicResourceExtension ResourceKey="AppBackgroundBrush" />
-  </Window.Background>
+        Title="Recode">
 
   <Design.DataContext>
     <vm:MainWindowViewModel />
   </Design.DataContext>
 
-  <Panel>
-    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="16">
-      <views:CompressionSettings Grid.Row="0" />
-      <views:FileQueue Grid.Row="1" />
-      <views:ControlBar Grid.Row="2" Margin="0,8,0,0" />
+  <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="16">
+    <views:CompressionSettings Grid.Row="0" />
+    <views:FileQueue Grid.Row="1" />
+    <views:ControlBar Grid.Row="2" Margin="0,8,0,0" />
 
-      <!-- FFmpeg download status (visible when not ready) -->
-      <StackPanel Grid.Row="3" Spacing="8" Margin="0,16,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
-                  IsVisible="{Binding !FfMpegReady}">
-        <TextBlock Text="Downloading FFmpeg..." VerticalAlignment="Center" />
-        <ProgressBar Value="{Binding FfMpegDownloadProgress}" Maximum="100" Width="300" />
-      </StackPanel>
-    </Grid>
-
-    <!-- Countdown overlay -->
-    <Border Background="#CC000000" IsVisible="{Binding CountdownVisible}">
-      <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
-        <TextBlock Text="{Binding CountdownMessage}" FontSize="20" Foreground="White"
-                   HorizontalAlignment="Center" />
-        <Button Content="Cancel" Command="{Binding CancelCountdownCommand}"
-                HorizontalAlignment="Center" MinWidth="120" HorizontalContentAlignment="Center" />
-      </StackPanel>
-    </Border>
-  </Panel>
+    <!-- FFmpeg download status (visible when not ready) -->
+    <StackPanel Grid.Row="3" Spacing="8" Margin="0,16,0,0" HorizontalAlignment="Center" Orientation="Horizontal"
+                IsVisible="{Binding !FfMpegReady}">
+      <TextBlock Text="Downloading FFmpeg..." VerticalAlignment="Center" />
+      <ProgressBar Value="{Binding FfMpegDownloadProgress}" Maximum="100" Width="300" />
+    </StackPanel>
+  </Grid>
 
 </Window>
