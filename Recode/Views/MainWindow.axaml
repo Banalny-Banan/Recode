@@ -9,7 +9,8 @@
         x:Class="Recode.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Recode">
+        Title="Recode"
+        RequestedThemeVariant="Dark">
 
   <Design.DataContext>
     <vm:MainWindowViewModel />

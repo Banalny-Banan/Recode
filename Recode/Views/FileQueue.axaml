@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Recode.ViewModels"
              xmlns:controls="clr-namespace:Recode.Controls"
-             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="92"
+             mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="150"
              x:Class="Recode.Views.FileQueue"
              x:DataType="vm:MainWindowViewModel">
 
@@ -25,7 +25,7 @@
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:QueueItemViewModel">
-                <Grid Margin="8,4" ColumnSpacing="4">
+                <Grid Margin="8,4" ColumnSpacing="4" MinHeight="20">
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="*" MaxWidth="200" />
@@ -38,30 +38,49 @@
                   </Grid>
                   <ProgressBar Grid.Column="1" Value="{Binding Progress}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
                   <TextBlock Grid.Column="2" Text="{Binding Status}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch">
-                    <Button Content="↻" Width="28" Padding="0" FontSize="14"
-                            Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry"
-                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-                    <Button Content="✕" Width="28" Padding="0" FontSize="14"
-                            Command="{Binding RemoveCommand}" ToolTip.Tip="Remove"
-                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                  <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="1" VerticalAlignment="Stretch">
+                    <StackPanel.Styles>
+                      <Style Selector="Button">
+                        <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />
+                      </Style>
+                      <Style Selector="Button:disabled /template/ ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
+                      </Style>
+                    </StackPanel.Styles>
+
+                    <Button Content="&#xE72C;" FontFamily="Segoe Fluent Icons"
+                            Width="28" Padding="0" FontSize="12" CornerRadius="4,0,0,4"
+                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry" />
+
+                    <Button Content="&#xE74D;" FontFamily="Segoe Fluent Icons"
+                            Width="28" Padding="0" FontSize="12" CornerRadius="0,4,4,0"
+                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Command="{Binding RemoveCommand}" ToolTip.Tip="Remove" />
+
                   </StackPanel>
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <TextBlock x:Name="BrowseText" Text="Drop files here or click to browse" HorizontalAlignment="Center" VerticalAlignment="Center"
-                     Cursor="Hand" PointerPressed="BrowseButton_OnClick" Margin="0,0,0,6">
-            <TextBlock.Styles>
-              <Style Selector="TextBlock#BrowseText">
+          <Border x:Name="BrowseContainer"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  Background="Transparent" Cursor="Hand"
+                  PointerPressed="BrowseButton_OnClick"
+                  Margin="0,0,0,6">
+            <Border.Styles>
+              <Style Selector="Border#BrowseContainer TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource AppTextDisabledBrush}" />
               </Style>
-              <Style Selector="TextBlock#BrowseText:pointerover">
+              <Style Selector="Border#BrowseContainer:pointerover TextBlock">
                 <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
               </Style>
-            </TextBlock.Styles>
-          </TextBlock>
+            </Border.Styles>
+            <TextBlock Text="Drop files here or click to browse"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+          </Border>
 
         </DockPanel>
 
