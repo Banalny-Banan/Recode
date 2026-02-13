@@ -13,5 +13,5 @@ public interface IFfMpegService
         CancellationToken cancellationToken);
 }
 
-public record struct CompressionResult(bool Success, string? ErrorMessage);
+public record struct CompressionResult(bool Success, string? ErrorMessage, long OutputSize = 0);
 public record struct CompressionOptions(Codec Codec, int Quality);

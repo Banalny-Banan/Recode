@@ -14,6 +14,6 @@ public static class Formatting
             len /= 1024;
         }
 
-        return $"{len:0.##} {sizes[order]}";
+        return $"{len:0.#} {sizes[order]}";
     }
 }

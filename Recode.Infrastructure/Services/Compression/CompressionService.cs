@@ -16,10 +16,15 @@ public class CompressionService(IFfMpegService ffMpegService) : ICompressionServ
         string outputPath = ResolveOutputPath(inputPath, output);
         CompressionResult result = await ffMpegService.CompressAsync(inputPath, outputPath, options, progress, cancellationToken);
 
-        if (result.Success && output.ReplaceOriginal)
+        if (!result.Success)
+            return result;
+
+        long outputSize = new FileInfo(outputPath).Length;
+
+        if (output.ReplaceOriginal)
             File.Move(outputPath, inputPath, true);
 
-        return result;
+        return result with { OutputSize = outputSize };
     }
 
     static string ResolveOutputPath(string inputPath, OutputOptions output)

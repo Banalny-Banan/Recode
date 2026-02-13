@@ -11,6 +11,7 @@ using Recode.Core.Services.Compression;
 using Recode.Core.Services.FfmpegManager;
 using Recode.Core.Services.FfMpegService;
 using Recode.Core.Services.Settings;
+using Recode.Core.Utility;
 
 namespace Recode.ViewModels;
 
@@ -128,12 +129,13 @@ public partial class MainWindowViewModel : ViewModelBase
                 if (result.Success)
                 {
                     item.Progress = 100;
+                    item.ResultSize = Formatting.FormatFileSize(result.OutputSize);
                     item.Status = QueueItemStatus.Completed;
                 }
                 else
                 {
                     item.Progress = 0;
-                    
+
                     if (_compressionCts.IsCancellationRequested)
                     {
                         item.Status = QueueItemStatus.Pending;
