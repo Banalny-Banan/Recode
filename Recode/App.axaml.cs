@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Recode.Core.Services;
 using Recode.Core.Services.FfmpegManager;
 using Recode.Core.Services.Settings;
+using Recode.Infrastructure.Services.FfmpegManager;
+using Recode.Infrastructure.Services.Settings;
 using Recode.ViewModels;
 using Recode.Views;
 

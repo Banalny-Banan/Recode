@@ -1,6 +1,7 @@
 using System.Text.Json;
+using Recode.Core.Services.Settings;
 
-namespace Recode.Core.Services.Settings;
+namespace Recode.Infrastructure.Services.Settings;
 
 public class SettingsService : ISettingsService
 {

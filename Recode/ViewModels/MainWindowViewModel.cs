@@ -122,10 +122,3 @@ public partial class MainWindowViewModel : ViewModelBase
         return (false, message);
     }
 }
-
-public static class QueueItemStatus
-{
-    public const string Pending = "Pending";
-    public const string Processing = "Processing";
-    public const string Completed = "Completed";
-}

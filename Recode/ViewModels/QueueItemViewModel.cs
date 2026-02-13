@@ -10,7 +10,7 @@ public partial class QueueItemViewModel : ViewModelBase
     double _progress;
 
     [ObservableProperty]
-    string _status = "Pending";
+    string _status = QueueItemStatus.Pending;
 
     public QueueItemViewModel(string filePath)
     {
@@ -32,4 +32,11 @@ public partial class QueueItemViewModel : ViewModelBase
     public string FilePath { get; }
     public string FileName { get; }
     public string FileSize { get; }
+}
+
+public static class QueueItemStatus
+{
+    public const string Pending = "Pending";
+    public const string Processing = "Processing";
+    public const string Completed = "Completed";
 }

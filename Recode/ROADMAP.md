@@ -5,9 +5,9 @@
 - [x] Create solution with 3 projects (Recode, Recode.Core, Recode.Infrastructure)
 - [x] Set up project references (Recode → Core + Infrastructure, Infrastructure → Core)
 - [x] Install NuGet packages
-  - Recode: Microsoft.Extensions.DependencyInjection, Serilog, Serilog.Sinks.File, Serilog.Sinks.Debug
-  - Recode.Infrastructure: CliWrap
-  - Recode.Core: nothing
+    - Recode: Microsoft.Extensions.DependencyInjection, Serilog, Serilog.Sinks.File, Serilog.Sinks.Debug
+    - Recode.Infrastructure: CliWrap
+    - Recode.Core: nothing
 - [x] Set up dependency injection in App.axaml.cs
 - [ ] Build MainWindow layout (title bar with gear icon, content area)
 - [ ] Build CompressionView layout (drop zone, codec selector, quality slider, speed/audio controls, output mode, queue list, bottom bar)

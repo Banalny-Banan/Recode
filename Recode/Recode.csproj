@@ -23,24 +23,24 @@
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-        <PackageReference Include="Semi.Avalonia" Version="11.3.7.3" />
-        <PackageReference Include="Serilog" Version="4.3.1" />
-        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
-        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3"/>
+        <PackageReference Include="Semi.Avalonia" Version="11.3.7.3"/>
+        <PackageReference Include="Serilog" Version="4.3.1"/>
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
+        <PackageReference Include="Serilog.Sinks.File" Version="7.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Recode.Core\Recode.Core.csproj" />
-      <ProjectReference Include="..\Recode.Infrastructure\Recode.Infrastructure.csproj" />
+        <ProjectReference Include="..\Recode.Core\Recode.Core.csproj"/>
+        <ProjectReference Include="..\Recode.Infrastructure\Recode.Infrastructure.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Controls\EnumSelector.axaml.cs">
-        <DependentUpon>EnumSelector.axaml</DependentUpon>
-      </Compile>
-      <Compile Update="ViewModels\MainWindowViewModel.Settings.cs">
-        <DependentUpon>MainWindowViewModel.cs</DependentUpon>
-      </Compile>
+        <Compile Update="Controls\EnumSelector.axaml.cs">
+            <DependentUpon>EnumSelector.axaml</DependentUpon>
+        </Compile>
+        <Compile Update="ViewModels\MainWindowViewModel.Settings.cs">
+            <DependentUpon>MainWindowViewModel.cs</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>

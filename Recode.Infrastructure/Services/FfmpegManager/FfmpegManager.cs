@@ -1,6 +1,7 @@
 using System.IO.Compression;
+using Recode.Core.Services.FfmpegManager;
 
-namespace Recode.Core.Services.FfmpegManager;
+namespace Recode.Infrastructure.Services.FfmpegManager;
 
 public class FfmpegManager : IFfmpegManager
 {
