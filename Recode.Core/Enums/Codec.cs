@@ -10,6 +10,8 @@ public class TooltipAttribute(string text) : Attribute
 
 public enum Codec
 {
+    [Description("None"), Tooltip("Copy without re-encoding (fast, no quality change)")]
+    None,
     [Description("H.264"), Tooltip("Fast encoding and balanced quality")]
     H264,
     [Description("H.265"), Tooltip("Better compression than H.264 at same quality, slower encoding")]

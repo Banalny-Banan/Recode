@@ -11,6 +11,8 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
     // GPU encoders ordered by priority: NVENC > AMF > QSV
     static readonly (string encoder, string vendor)[][] GpuEncoders =
     [
+        // None — no encoding
+        [],
         // H.264
         [("h264_nvenc", "nvenc"), ("h264_amf", "amf"), ("h264_qsv", "qsv")],
         // H.265
@@ -103,36 +105,50 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
 
     string[] BuildArguments(string inputPath, string outputPath, FfMpegOptions options)
     {
-        int crf = CalculateCrf(options.Codec, options.Quality);
-        string? gpuEncoder = options.UseGpu ? FindGpuEncoder(options.Codec) : null;
-        string encoder = gpuEncoder ?? GetSoftwareEncoder(options.Codec);
-
         List<string> args =
         [
             "-y", // overwrite output without asking
             "-nostdin", // don't read from stdin (prevents hanging)
             "-stats_period", "0.1", // update progress 10 times per second
             "-i", inputPath,
-            "-c:v", encoder,
         ];
 
-        if (gpuEncoder != null)
-            AddGpuQualityArgs(args, gpuEncoder, crf);
+        // None codec: copy both video and audio without re-encoding
+        if (options.Codec == Codec.None)
+        {
+            args.Add("-c:v");
+            args.Add("copy");
+            args.Add("-c:a");
+            args.Add("copy");
+        }
         else
         {
-            args.Add("-crf");
-            args.Add(crf.ToString());
+            int crf = CalculateCrf(options.Codec, options.Quality);
+            string? gpuEncoder = options.UseGpu ? FindGpuEncoder(options.Codec) : null;
+            string encoder = gpuEncoder ?? GetSoftwareEncoder(options.Codec);
 
-            // VP9 requires -b:v 0 for CRF mode
-            if (options.Codec is Codec.Vp9)
+            args.Add("-c:v");
+            args.Add(encoder);
+
+            if (gpuEncoder != null)
+                AddGpuQualityArgs(args, gpuEncoder, crf);
+            else
             {
-                args.Add("-b:v");
-                args.Add("0");
+                args.Add("-crf");
+                args.Add(crf.ToString());
+
+                // VP9 requires -b:v 0 for CRF mode
+                if (options.Codec is Codec.Vp9)
+                {
+                    args.Add("-b:v");
+                    args.Add("0");
+                }
             }
+
+            args.Add("-c:a");
+            args.Add("copy"); // keep audio as-is
         }
 
-        args.Add("-c:a");
-        args.Add("copy"); // keep audio as-is
         args.Add(outputPath);
 
         return args.ToArray();
@@ -140,6 +156,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
 
     static string GetSoftwareEncoder(Codec codec) => codec switch
     {
+        Codec.None => "copy",
         Codec.H264 => "libx264",
         Codec.H265 => "libx265",
         Codec.Vp9 => "libvpx-vp9",
@@ -216,7 +233,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
     static int CalculateCrf(Codec codec, int quality)
     {
         // Quality is 0-100 (higher = better), CRF is inverted (lower = better)
-        int maxCrf = codec is Codec.Vp9 ? 63 : 51;
+        int maxCrf = codec is Codec.None ? 0 : codec is Codec.Vp9 ? 63 : 51;
         return maxCrf - (int)(maxCrf * quality / 100.0);
     }
 
