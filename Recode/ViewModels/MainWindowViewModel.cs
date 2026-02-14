@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Recode.Core.Enums;
 using Recode.Core.Services.Compression;
@@ -8,6 +9,7 @@ using Recode.Core.Services.FfmpegManager;
 using Recode.Core.Services.History;
 using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;
+using Recode.Views;
 
 namespace Recode.ViewModels;
 
@@ -80,6 +82,28 @@ public partial class MainWindowViewModel : ViewModelBase
 
             QueueItems.Add(new QueueItemViewModel(path, RemoveItem, NotifyProgressChanged));
         }
+    }
+
+    public async Task AddFilesWithHistoryCheckAsync(IEnumerable<string> filePaths)
+    {
+        var paths = filePaths.ToList();
+        List<string> alreadyCompressed = paths.Where(IsAlreadyCompressed).ToList();
+
+        if (alreadyCompressed.Count > 0)
+        {
+            string message = alreadyCompressed.Count == paths.Count
+                ? alreadyCompressed.Count == 1
+                    ? "This file has already been compressed. Add it anyway?"
+                    : $"All {alreadyCompressed.Count} files have already been compressed. Add them anyway?"
+                : $"{alreadyCompressed.Count} of {paths.Count} files have already been compressed. Add them anyway?";
+
+            bool addAll = await AppDialog.AskYesNo("Already Compressed", message);
+
+            if (!addAll)
+                paths = paths.Except(alreadyCompressed).ToList();
+        }
+
+        AddFiles(paths);
     }
 
     void RemoveItem(QueueItemViewModel item)

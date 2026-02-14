@@ -8,22 +8,16 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Recode.Core.Utility;
 using Recode.ViewModels;
 
 namespace Recode.Views;
 
 public partial class FileQueue : UserControl
 {
-    static readonly HashSet<string> VideoExtensions =
-    [
-        ".mp4", ".mkv", ".avi",
-        ".mov", ".flv", ".wmv",
-        ".webm", ".ts", ".m2ts",
-    ];
-
-    static readonly FilePickerFileType VideoFiles = new("Video files")
+    static readonly FilePickerFileType VideoFileType = new("Video files")
     {
-        Patterns = VideoExtensions.Select(ext => $"*{ext}").ToList(),
+        Patterns = VideoFiles.Extensions.Select(ext => $"*{ext}").ToList(),
     };
 
     public FileQueue()
@@ -68,11 +62,11 @@ public partial class FileQueue : UserControl
 
         List<string> paths = files
             .Select(f => f.Path.LocalPath)
-            .Where(p => VideoExtensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
+            .Where(p => VideoFiles.Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
             .ToList();
 
         if (DataContext is MainWindowViewModel vm)
-            await AddFilesWithHistoryCheck(vm, paths);
+            await vm.AddFilesWithHistoryCheckAsync(paths);
     }
 
     async void BrowseButton_OnClick(object? sender, RoutedEventArgs e)
@@ -88,39 +82,18 @@ public partial class FileQueue : UserControl
             {
                 Title = "Select video files",
                 AllowMultiple = true,
-                FileTypeFilter = [VideoFiles],
+                FileTypeFilter = [VideoFileType],
             });
 
             if (files.Count > 0 && DataContext is MainWindowViewModel vm)
             {
                 List<string> paths = files.Select(f => f.Path.LocalPath).ToList();
-                await AddFilesWithHistoryCheck(vm, paths);
+                await vm.AddFilesWithHistoryCheckAsync(paths);
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error picking files: {ex.Message}");
         }
-    }
-
-    async Task AddFilesWithHistoryCheck(MainWindowViewModel vm, List<string> paths)
-    {
-        List<string> alreadyCompressed = paths.Where(vm.IsAlreadyCompressed).ToList();
-
-        if (alreadyCompressed.Count > 0)
-        {
-            string message = alreadyCompressed.Count == paths.Count
-                ? alreadyCompressed.Count == 1
-                    ? "This file has already been compressed. Add it anyway?"
-                    : $"All {alreadyCompressed.Count} files have already been compressed. Add them anyway?"
-                : $"{alreadyCompressed.Count} of {paths.Count} files have already been compressed. Add them anyway?";
-
-            bool addAll = await AppDialog.AskYesNo("Already Compressed", message);
-
-            if (!addAll)
-                paths = paths.Except(alreadyCompressed).ToList();
-        }
-
-        vm.AddFiles(paths);
     }
 }
