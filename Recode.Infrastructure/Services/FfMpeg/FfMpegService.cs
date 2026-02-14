@@ -113,41 +113,30 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
             "-i", inputPath,
         ];
 
-        // None codec: copy both video and audio without re-encoding
-        if (options.Codec == Codec.None)
-        {
-            args.Add("-c:v");
-            args.Add("copy");
-            args.Add("-c:a");
-            args.Add("copy");
-        }
+        int crf = CalculateCrf(options.Codec, options.Quality);
+        string? gpuEncoder = options.UseGpu ? FindGpuEncoder(options.Codec) : null;
+        string encoder = gpuEncoder ?? GetSoftwareEncoder(options.Codec);
+
+        args.Add("-c:v");
+        args.Add(encoder);
+
+        if (gpuEncoder != null)
+            AddGpuQualityArgs(args, gpuEncoder, crf);
         else
         {
-            int crf = CalculateCrf(options.Codec, options.Quality);
-            string? gpuEncoder = options.UseGpu ? FindGpuEncoder(options.Codec) : null;
-            string encoder = gpuEncoder ?? GetSoftwareEncoder(options.Codec);
+            args.Add("-crf");
+            args.Add(crf.ToString());
 
-            args.Add("-c:v");
-            args.Add(encoder);
-
-            if (gpuEncoder != null)
-                AddGpuQualityArgs(args, gpuEncoder, crf);
-            else
+            // VP9 requires -b:v 0 for CRF mode
+            if (options.Codec is Codec.Vp9)
             {
-                args.Add("-crf");
-                args.Add(crf.ToString());
-
-                // VP9 requires -b:v 0 for CRF mode
-                if (options.Codec is Codec.Vp9)
-                {
-                    args.Add("-b:v");
-                    args.Add("0");
-                }
+                args.Add("-b:v");
+                args.Add("0");
             }
-
-            args.Add("-c:a");
-            args.Add("copy"); // keep audio as-is
         }
+
+        args.Add("-c:a");
+        args.Add("copy");
 
         args.Add(outputPath);
 
@@ -156,7 +145,6 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
 
     static string GetSoftwareEncoder(Codec codec) => codec switch
     {
-        Codec.None => "copy",
         Codec.H264 => "libx264",
         Codec.H265 => "libx265",
         Codec.Vp9 => "libvpx-vp9",
@@ -233,7 +221,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
     static int CalculateCrf(Codec codec, int quality)
     {
         // Quality is 0-100 (higher = better), CRF is inverted (lower = better)
-        int maxCrf = codec is Codec.None ? 0 : codec is Codec.Vp9 ? 63 : 51;
+        int maxCrf = codec == Codec.Vp9 ? 63 : 51;
         return maxCrf - (int)(maxCrf * quality / 100.0);
     }
 
