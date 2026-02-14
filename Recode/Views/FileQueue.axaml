@@ -19,7 +19,7 @@
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:QueueItemViewModel">
-                <Grid Margin="8,4" ColumnSpacing="4" MinHeight="20" ToolTip.Tip="{Binding ErrorMessage}" Background="Transparent">
+                <Grid Margin="8,4" ColumnSpacing="4" MinHeight="24" ToolTip.Tip="{Binding ErrorMessage}" Background="Transparent">
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="*" MaxWidth="200" />
@@ -41,12 +41,12 @@
                     </StackPanel.Styles>
 
                     <Button Content="&#xE72C;" FontFamily="Segoe Fluent Icons"
-                            Width="28" Padding="0" FontSize="12" CornerRadius="4,0,0,4"
+                            Width="28" Padding="0" FontSize="14" CornerRadius="4,0,0,4"
                             VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                             Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry" />
 
                     <Button Content="&#xE74D;" FontFamily="Segoe Fluent Icons"
-                            Width="28" Padding="0" FontSize="12" CornerRadius="0,4,4,0"
+                            Width="28" Padding="0" FontSize="14" CornerRadius="0,4,4,0"
                             VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                             Command="{Binding RemoveCommand}" ToolTip.Tip="Remove" />
 
