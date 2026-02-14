@@ -8,6 +8,19 @@ namespace Recode.Infrastructure.Services.FfMpeg;
 
 public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegService
 {
+    // GPU encoders ordered by priority: NVENC > AMF > QSV
+    static readonly (string encoder, string vendor)[][] GpuEncoders =
+    [
+        // H.264
+        [("h264_nvenc", "nvenc"), ("h264_amf", "amf"), ("h264_qsv", "qsv")],
+        // H.265
+        [("hevc_nvenc", "nvenc"), ("hevc_amf", "amf"), ("hevc_qsv", "qsv")],
+        // VP9 — no GPU encoders
+        [],
+        // AV1
+        [("av1_nvenc", "nvenc"), ("av1_amf", "amf"), ("av1_qsv", "qsv")],
+    ];
+
     readonly string _ffmpegPath = ffmpegManager.FfmpegPath;
     HashSet<string>? _availableEncoders;
 
@@ -94,6 +107,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         [
             "-y", // overwrite output without asking
             "-nostdin", // don't read from stdin (prevents hanging)
+            "-stats_period", "0.1", // update progress 10 times per second
             "-i", inputPath,
             "-c:v", encoder,
         ];
@@ -129,25 +143,12 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         _ => throw new ArgumentOutOfRangeException(nameof(codec)),
     };
 
-    // GPU encoders ordered by priority: NVENC > AMF > QSV
-    static readonly (string encoder, string vendor)[][] GpuEncoders =
-    [
-        // H.264
-        [("h264_nvenc", "nvenc"), ("h264_amf", "amf"), ("h264_qsv", "qsv")],
-        // H.265
-        [("hevc_nvenc", "nvenc"), ("hevc_amf", "amf"), ("hevc_qsv", "qsv")],
-        // VP9 — no GPU encoders
-        [],
-        // AV1
-        [("av1_nvenc", "nvenc"), ("av1_amf", "amf"), ("av1_qsv", "qsv")],
-    ];
-
     string? FindGpuEncoder(Codec codec)
     {
         if (_availableEncoders is null)
             return null;
 
-        var candidates = GpuEncoders[(int)codec];
+        (string encoder, string vendor)[] candidates = GpuEncoders[(int)codec];
 
         foreach ((string encoder, _) in candidates)
         {
@@ -195,10 +196,12 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
             {
                 // Lines look like: " V..... h264_nvenc  NVIDIA NVENC H.264 encoder (codec h264)"
                 string trimmed = line.TrimStart();
+
                 if (!trimmed.StartsWith("V"))
                     return;
 
                 string[] parts = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
                 if (parts.Length >= 2)
                     encoders.Add(parts[1]);
             }))

@@ -12,8 +12,8 @@ public class SmoothProgressBar : ProgressBar
         new DoubleTransition
         {
             Property = ValueProperty,
-            Duration = TimeSpan.FromMilliseconds(100),
-            Easing = new SineEaseOut(),
+            Duration = TimeSpan.FromMilliseconds(120),
+            Easing = new LinearEasing(),
         },
     ];
 
