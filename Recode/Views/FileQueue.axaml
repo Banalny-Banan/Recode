@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Recode.ViewModels"
+             xmlns:views="clr-namespace:Recode.Views"
              xmlns:controls="clr-namespace:Recode.Controls"
              mc:Ignorable="d" d:DesignWidth="568" d:DesignHeight="150"
              x:Class="Recode.Views.FileQueue"
@@ -13,45 +14,13 @@
     <Border BorderBrush="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppInsetBrush}"
             BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0" DragDrop.AllowDrop="True">
 
-      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="20" VerticalScrollBarVisibility="Hidden">
+      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="30" VerticalScrollBarVisibility="Hidden">
 
         <DockPanel MinHeight="{Binding $parent[controls:SmoothScrollViewer].Viewport.Height}">
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:QueueItemViewModel">
-                <Grid Margin="8,4" ColumnSpacing="4" MinHeight="24" ToolTip.Tip="{Binding ErrorMessage}" Background="Transparent">
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="*" MaxWidth="200" />
-                    <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
-                  <Grid Grid.Column="0" ColumnDefinitions="*,Auto">
-                    <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0" />
-                  </Grid>
-                  <controls:SmoothProgressBar Grid.Column="1" Value="{Binding Progress}" Foreground="{Binding ProgressBarBrush}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
-                  <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch" Margin="0,-2">
-                    <StackPanel.Styles>
-                      <Style Selector="Button">
-                        <Setter Property="Background" Value="{DynamicResource AppSurfaceBrush}" />
-                      </Style>
-                      <Style Selector="Button:disabled /template/ ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
-                      </Style>
-                    </StackPanel.Styles>
-
-                    <Button Content="&#xE72C;" FontFamily="Segoe Fluent Icons"
-                            Width="28" Padding="0" FontSize="14" CornerRadius="4,0,0,4"
-                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry" />
-
-                    <Button Content="&#xE74D;" FontFamily="Segoe Fluent Icons"
-                            Width="28" Padding="0" FontSize="14" CornerRadius="0,4,4,0"
-                            VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                            Command="{Binding RemoveCommand}" ToolTip.Tip="Remove" />
-
-                  </StackPanel>
-                </Grid>
+                <views:QueueItemView />
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>

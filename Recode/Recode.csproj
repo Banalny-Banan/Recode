@@ -54,5 +54,8 @@
         <Compile Update="Views\AppDialog.axaml.cs">
           <DependentUpon>AppDialog.axaml</DependentUpon>
         </Compile>
+        <Compile Update="Views\QueueItemView.axaml.cs">
+          <DependentUpon>QueueItemView.axaml</DependentUpon>
+        </Compile>
     </ItemGroup>
 </Project>
