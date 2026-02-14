@@ -29,7 +29,7 @@
                     <TextBlock Grid.Column="0" Text="{Binding FileName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                     <TextBlock Grid.Column="1" Text="{Binding SizeDisplay}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0" />
                   </Grid>
-                  <ProgressBar Grid.Column="1" Value="{Binding Progress}" Foreground="{Binding ProgressBarBrush}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
+                  <controls:SmoothProgressBar Grid.Column="1" Value="{Binding Progress}" Foreground="{Binding ProgressBarBrush}" MinWidth="70" VerticalAlignment="Center" Margin="4" />
                   <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Stretch" Margin="0,-2">
                     <StackPanel.Styles>
                       <Style Selector="Button">
@@ -80,7 +80,7 @@
 
     </Border>
 
-    <ProgressBar Grid.Row="1" Value="{Binding OverallProgress}" MinHeight="6" CornerRadius="0,0,4,4" />
+    <controls:SmoothProgressBar Grid.Row="1" Value="{Binding OverallProgress}" MinHeight="6" CornerRadius="0,0,4,4" />
 
   </Grid>
 
