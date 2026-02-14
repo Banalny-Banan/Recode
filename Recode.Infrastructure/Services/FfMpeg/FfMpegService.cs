@@ -17,8 +17,6 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         [("hevc_nvenc", "nvenc"), ("hevc_amf", "amf"), ("hevc_qsv", "qsv")],
         // VP9 — no GPU encoders
         [],
-        // AV1
-        [("av1_nvenc", "nvenc"), ("av1_amf", "amf"), ("av1_qsv", "qsv")],
     ];
 
     readonly string _ffmpegPath = ffmpegManager.FfmpegPath;
@@ -43,12 +41,14 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
                 return new FfMpegResult(false, "Could not determine file duration");
 
             var lastStderrLine = "";
+            var stderrLines = new List<string>();
 
             CommandResult result = await Cli.Wrap(_ffmpegPath)
                 .WithArguments(BuildArguments(inputPath, outputPath, options))
                 .WithStandardErrorPipe(PipeTarget.ToDelegate(line =>
                 {
                     lastStderrLine = line;
+                    stderrLines.Add(line);
                     TimeSpan? currentTime = ParseTime(line);
 
                     if (currentTime.HasValue)
@@ -58,7 +58,11 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
                 .ExecuteAsync(cancellationToken);
 
             if (result.ExitCode != 0)
-                return new FfMpegResult(false, lastStderrLine);
+            {
+                // Get the last few meaningful error lines
+                string errorMsg = string.Join("\n", stderrLines.TakeLast(10).Where(l => !string.IsNullOrWhiteSpace(l)));
+                return new FfMpegResult(false, string.IsNullOrEmpty(errorMsg) ? lastStderrLine : errorMsg);
+            }
 
             return new FfMpegResult(true, null);
         }
@@ -119,8 +123,8 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
             args.Add("-crf");
             args.Add(crf.ToString());
 
-            // VP9 and AV1 require -b:v 0 for CRF mode
-            if (options.Codec is Codec.Vp9 or Codec.Av1)
+            // VP9 requires -b:v 0 for CRF mode
+            if (options.Codec is Codec.Vp9)
             {
                 args.Add("-b:v");
                 args.Add("0");
@@ -139,7 +143,6 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         Codec.H264 => "libx264",
         Codec.H265 => "libx265",
         Codec.Vp9 => "libvpx-vp9",
-        Codec.Av1 => "libaom-av1",
         _ => throw new ArgumentOutOfRangeException(nameof(codec)),
     };
 
@@ -213,7 +216,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
     static int CalculateCrf(Codec codec, int quality)
     {
         // Quality is 0-100 (higher = better), CRF is inverted (lower = better)
-        int maxCrf = codec is Codec.Vp9 or Codec.Av1 ? 63 : 51;
+        int maxCrf = codec is Codec.Vp9 ? 63 : 51;
         return maxCrf - (int)(maxCrf * quality / 100.0);
     }
 

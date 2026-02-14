@@ -12,6 +12,7 @@ namespace Recode.ViewModels;
 public partial class QueueItemViewModel : ViewModelBase
 {
     readonly Action<QueueItemViewModel>? _removeAction;
+    readonly Action? _notifyProgressChanged;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
     string _fileSize;
@@ -25,13 +26,17 @@ public partial class QueueItemViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
     string? _resultSize;
 
-    public QueueItemViewModel(string filePath, Action<QueueItemViewModel> removeAction)
+    [ObservableProperty]
+    string? _errorMessage;
+
+    public QueueItemViewModel(string filePath, Action<QueueItemViewModel> removeAction, Action? notifyProgressChanged = null)
     {
         FileInfo info = new(filePath);
         FilePath = filePath;
         FileName = info.Name;
         _fileSize = Formatting.FormatFileSize(info.Length);
         _removeAction = removeAction;
+        _notifyProgressChanged = notifyProgressChanged;
     }
 
     internal QueueItemViewModel(string fileName, string fileSize, double progress, QueueItemStatus status)
@@ -72,10 +77,13 @@ public partial class QueueItemViewModel : ViewModelBase
     {
         Progress = 0;
         ResultSize = null;
+        ErrorMessage = null;
         Status = QueueItemStatus.Pending;
 
         if (!string.IsNullOrEmpty(FilePath))
             FileSize = Formatting.FormatFileSize(new FileInfo(FilePath).Length);
+
+        _notifyProgressChanged?.Invoke();
     }
 
     [RelayCommand]

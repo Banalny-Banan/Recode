@@ -99,7 +99,6 @@ Views depend on ViewModels. ViewModels depend on Core interfaces only. Infrastru
 | H.264      | libx264         | 0-51      |
 | H.265/HEVC | libx265         | 0-51      |
 | VP9        | libvpx-vp9      | 0-63      |
-| AV1        | libaom-av1      | 0-63      |
 
 Each codec has a `[Tooltip]` attribute with usage guidance shown on hover.
 
@@ -113,7 +112,6 @@ GPU-accelerated encoding option for significantly faster processing (5-10x) at t
 |-------|-----------------|------------|-------------|
 | H.264 | h264_nvenc      | h264_amf   | h264_qsv    |
 | H.265 | hevc_nvenc      | hevc_amf   | hevc_qsv    |
-| AV1   | av1_nvenc       | av1_amf    | av1_qsv     |
 
 - Checkbox or toggle in compression settings to enable GPU encoding
 - Auto-detect available GPU encoders by probing ffmpeg
@@ -193,7 +191,7 @@ FFmpeg is **not bundled** with the app. It is downloaded on first launch.
 [gyan.dev](https://www.gyan.dev/ffmpeg/builds/) essentials build (~45 MB zip).
 
 - Stable URL: `https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip`
-- Contains all required codecs (libx264, libx265, libvpx-vp9, libaom-av1) and GPU encoders
+- Contains all required codecs (libx264, libx265, libvpx-vp9) and GPU encoders
 
 #### 4.3.2 Download Flow
 
@@ -265,7 +263,7 @@ MainWindow uses a Grid with `RowDefinitions="Auto,*,Auto,Auto"` and 16px margin:
 ```
 +--[ Recode ]------------------------------------------+
 |                                                       |
-|  Codec:   [H.264] [H.265] [VP9] [AV1]               |
+|  Codec:   [H.264] [H.265] [VP9]                      |
 |  Quality: [====O==============] 50%                   |
 |                     Output: [C:\...\Recode  ]         |
 |                     [x] Replace files                 |
@@ -325,12 +323,11 @@ Dialog uses `SizeToContent="Height"`, centers on owner window, inherits app them
 H.264:  -y -nostdin -i "input" -c:v libx264 -crf {crf} -c:a copy "output"
 H.265:  -y -nostdin -i "input" -c:v libx265 -crf {crf} -c:a copy "output"
 VP9:    -y -nostdin -i "input" -c:v libvpx-vp9 -crf {crf} -b:v 0 -c:a copy "output"
-AV1:    -y -nostdin -i "input" -c:v libaom-av1 -crf {crf} -b:v 0 -c:a copy "output"
 ```
 
 Quality slider (0-100, higher = better) mapped to CRF (lower = better):
 - H.264/H.265: `crf = 51 - (51 * quality / 100)`
-- VP9/AV1: `crf = 63 - (63 * quality / 100)`
+- VP9: `crf = 63 - (63 * quality / 100)`
 
 ### 6.3 Progress Parsing
 

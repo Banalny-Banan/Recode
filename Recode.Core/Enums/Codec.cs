@@ -16,6 +16,4 @@ public enum Codec
     H265,
     [Description("VP9"), Tooltip("Best compression for low quality settings, slower encoding, outputs .webm")]
     Vp9,
-    [Description("AV1"), Tooltip("Best compression, very slow encoding")]
-    Av1,
 }

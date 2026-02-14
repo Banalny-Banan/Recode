@@ -78,7 +78,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (QueueItems.Any(item => item.FilePath == path))
                 continue;
 
-            QueueItems.Add(new QueueItemViewModel(path, RemoveItem));
+            QueueItems.Add(new QueueItemViewModel(path, RemoveItem, NotifyProgressChanged));
         }
     }
 
@@ -90,4 +90,6 @@ public partial class MainWindowViewModel : ViewModelBase
         QueueItems.Remove(item);
         OnPropertyChanged(nameof(OverallProgress));
     }
+
+    void NotifyProgressChanged() => OnPropertyChanged(nameof(OverallProgress));
 }
