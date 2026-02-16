@@ -25,22 +25,20 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
 
-          <Border x:Name="BrowseContainer"
+          <Border x:Name="BrowseContainer" Background="Transparent" Padding="0,0,0,6"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  Background="Transparent" Cursor="Hand"
-                  PointerPressed="BrowseButton_OnClick"
-                  Margin="0,0,0,6">
-            <Border.Styles>
-              <Style Selector="Border#BrowseContainer TextBlock">
-                <Setter Property="Foreground" Value="{DynamicResource AppTextDisabledBrush}" />
-              </Style>
-              <Style Selector="Border#BrowseContainer:pointerover TextBlock">
-                <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
-              </Style>
-            </Border.Styles>
+                  Cursor="Hand" PointerPressed="BrowseButton_OnClick">
             <TextBlock Text="Drop files here or click to browse"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center" />
+                       HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TextBlock.Styles>
+                <Style Selector="TextBlock">
+                  <Setter Property="Foreground" Value="{DynamicResource AppTextDisabledBrush}" />
+                </Style>
+                <Style Selector="Border#BrowseContainer:pointerover TextBlock">
+                  <Setter Property="Foreground" Value="{DynamicResource AppTextSecondaryBrush}" />
+                </Style>
+              </TextBlock.Styles>
+            </TextBlock>
           </Border>
 
         </DockPanel>
