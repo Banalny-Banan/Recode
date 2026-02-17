@@ -43,7 +43,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
                 return new FfMpegResult(false, "Could not determine file duration");
 
             var lastStderrLine = "";
-            var stderrLines = new List<string>();
+            List<string> stderrLines = [];
 
             CommandResult result = await Cli.Wrap(_ffmpegPath)
                 .WithArguments(BuildArguments(inputPath, outputPath, options))
@@ -77,7 +77,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         }
         catch (Exception ex)
         {
-            return new FfMpegResult(false, ex.Message);
+            return new FfMpegResult(false, $"An error occurred: {ex.Message}");
         }
     }
 
