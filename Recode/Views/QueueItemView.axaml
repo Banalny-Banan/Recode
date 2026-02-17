@@ -6,7 +6,8 @@
              xmlns:controls="clr-namespace:Recode.Controls"
              mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="24"
              x:Class="Recode.Views.QueueItemView"
-             x:DataType="vm:QueueItemViewModel">
+             x:DataType="vm:QueueItemViewModel"
+             ClipToBounds="True">
 
   <Grid Margin="8,4" ColumnSpacing="4" MinHeight="20" ToolTip.Tip="{Binding ErrorMessage}" Background="Transparent">
     <Grid.ColumnDefinitions>
@@ -78,7 +79,7 @@
       <Button Content="&#xE74D;" FontFamily="Segoe Fluent Icons"
               Width="28" Padding="0" FontSize="14" CornerRadius="0,4,4,0"
               VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-              Command="{Binding RemoveCommand}" ToolTip.Tip="Remove" />
+              Click="RemoveButton_OnClick" ToolTip.Tip="Remove" />
 
     </StackPanel>
   </Grid>

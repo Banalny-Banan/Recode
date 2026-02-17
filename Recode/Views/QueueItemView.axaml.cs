@@ -1,10 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Styling;
 using Recode.ViewModels;
 
 namespace Recode.Views;
@@ -39,6 +41,27 @@ public partial class QueueItemView : UserControl
             return;
 
         await PlayCopiedAnimation(button);
+    }
+
+    async void RemoveButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        IsHitTestVisible = false;
+
+        Animation animation = new()
+        {
+            Duration = TimeSpan.FromMilliseconds(100),
+            FillMode = FillMode.Forward,
+            Children =
+            {
+                new KeyFrame { Cue = new Cue(0d), Setters = { new Setter(OpacityProperty, 1d), new Setter(MaxHeightProperty, Bounds.Height) } },
+                new KeyFrame { Cue = new Cue(1d), Setters = { new Setter(OpacityProperty, 0d), new Setter(MaxHeightProperty, 0d) } },
+            },
+        };
+
+        await animation.RunAsync(this);
+
+        if (DataContext is QueueItemViewModel vm)
+            vm.RemoveCommand.Execute(null);
     }
 
     async Task PlayCopiedAnimation(Button button)
