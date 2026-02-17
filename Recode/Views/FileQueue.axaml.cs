@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -23,8 +24,8 @@ public partial class FileQueue : UserControl
     public FileQueue()
     {
         InitializeComponent();
-        AddHandler(DragDrop.DropEvent, OnDrop);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DropEvent, OnDrop);
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
 
@@ -59,37 +60,6 @@ public partial class FileQueue : UserControl
             topLevel.RemoveHandler(KeyDownEvent, OnGlobalKeyDown);
     }
 
-    async void OnGlobalKeyDown(object? sender, KeyEventArgs e)
-    {
-        List<KeyGesture>? pasteGestures = Application.Current?.PlatformSettings?.HotkeyConfiguration.Paste;
-
-        if (pasteGestures?.Any(g => g.Matches(e)) != true)
-            return;
-
-        var topLevel = TopLevel.GetTopLevel(this);
-
-        if (topLevel?.Clipboard is not { } clipboard)
-            return;
-
-        using IAsyncDataTransfer? dataTransfer = await clipboard.TryGetDataAsync();
-
-        if (dataTransfer is null)
-            return;
-
-        IStorageItem[]? files = await dataTransfer.TryGetFilesAsync();
-
-        if (files is null)
-            return;
-
-        List<string> paths = files
-            .Select(f => f.Path.LocalPath)
-            .Where(p => VideoFiles.Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
-            .ToList();
-
-        if (paths.Count > 0 && DataContext is MainWindowViewModel vm)
-            await vm.AddFilesWithHistoryCheckAsync(paths);
-    }
-
     void OnDragOver(object? sender, DragEventArgs e)
     {
         e.DragEffects = e.DataTransfer.Contains(DataFormat.File)
@@ -97,23 +67,9 @@ public partial class FileQueue : UserControl
             : DragDropEffects.None;
     }
 
-    async void OnDrop(object? sender, DragEventArgs e)
-    {
-        if (!e.DataTransfer.Contains(DataFormat.File))
-            return;
-
-        if (e.DataTransfer.TryGetFiles() is not IEnumerable<IStorageItem> files)
-            return;
-
-        List<string> paths = files
-            .Select(f => f.Path.LocalPath)
-            .Where(p => VideoFiles.Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
-            .ToList();
-
-        if (DataContext is MainWindowViewModel vm)
-            await vm.AddFilesWithHistoryCheckAsync(paths);
-    }
-
+    /// <summary>
+    ///     Handles file browse input method.
+    /// </summary>
     async void BrowseButton_OnClick(object? sender, RoutedEventArgs e)
     {
         try
@@ -130,15 +86,78 @@ public partial class FileQueue : UserControl
                 FileTypeFilter = [VideoFileType],
             });
 
-            if (files.Count > 0 && DataContext is MainWindowViewModel vm)
-            {
-                List<string> paths = files.Select(f => f.Path.LocalPath).ToList();
-                await vm.AddFilesWithHistoryCheckAsync(paths);
-            }
+            await AddStorageItems(files);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error picking files: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    ///     Handles drag-and-drop input method.
+    /// </summary>
+    async void OnDrop(object? sender, DragEventArgs e)
+    {
+        try
+        {
+            if (!e.DataTransfer.Contains(DataFormat.File))
+                return;
+
+            if (e.DataTransfer.TryGetFiles() is not IEnumerable<IStorageItem> files)
+                return;
+
+            await AddStorageItems(files);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error handling dropped files: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    ///     Handles paste input method.
+    /// </summary>
+    async void OnGlobalKeyDown(object? sender, KeyEventArgs e)
+    {
+        try
+        {
+            List<KeyGesture>? pasteGestures = Application.Current?.PlatformSettings?.HotkeyConfiguration.Paste;
+
+            if (pasteGestures?.Any(g => g.Matches(e)) != true)
+                return;
+
+            var topLevel = TopLevel.GetTopLevel(this);
+
+            if (topLevel?.Clipboard is not { } clipboard)
+                return;
+
+            using IAsyncDataTransfer? dataTransfer = await clipboard.TryGetDataAsync();
+
+            if (dataTransfer is null)
+                return;
+
+            IStorageItem[]? files = await dataTransfer.TryGetFilesAsync();
+
+            if (files is null)
+                return;
+
+            await AddStorageItems(files);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error handling paste: {ex.Message}");
+        }
+    }
+
+    async Task AddStorageItems(IEnumerable<IStorageItem> items)
+    {
+        List<string> paths = items
+            .Select(f => f.Path.LocalPath)
+            .Where(p => VideoFiles.Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
+            .ToList();
+
+        if (DataContext is MainWindowViewModel vm)
+            await vm.AddFilesWithHistoryCheckAsync(paths);
     }
 }

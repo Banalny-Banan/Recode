@@ -84,26 +84,25 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public async Task AddFilesWithHistoryCheckAsync(IEnumerable<string> filePaths)
+    public async Task AddFilesWithHistoryCheckAsync(IList<string> filePaths)
     {
-        var paths = filePaths.ToList();
-        List<string> alreadyCompressed = paths.Where(IsAlreadyCompressed).ToList();
+        List<string> alreadyCompressed = filePaths.Where(IsAlreadyCompressed).ToList();
 
         if (alreadyCompressed.Count > 0)
         {
-            string message = alreadyCompressed.Count == paths.Count
+            string message = alreadyCompressed.Count == filePaths.Count
                 ? alreadyCompressed.Count == 1
                     ? "This file has already been compressed. Add it anyway?"
                     : $"All {alreadyCompressed.Count} files have already been compressed. Add them anyway?"
-                : $"{alreadyCompressed.Count} of {paths.Count} files have already been compressed. Add them anyway?";
+                : $"{alreadyCompressed.Count} of {filePaths.Count} files have already been compressed. Add them anyway?";
 
             bool addAll = await AppDialog.AskYesNo("Already Compressed", message);
 
             if (!addAll)
-                paths = paths.Except(alreadyCompressed).ToList();
+                filePaths = filePaths.Except(alreadyCompressed).ToList();
         }
 
-        AddFiles(paths);
+        AddFiles(filePaths);
     }
 
     void RemoveItem(QueueItemViewModel item)

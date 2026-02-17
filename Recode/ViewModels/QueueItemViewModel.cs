@@ -48,9 +48,11 @@ public partial class QueueItemViewModel : ViewModelBase
         Status = status;
     }
 
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanCopy))]
+    string? _outputFilePath;
+
     public string FilePath { get; }
     public string FileName { get; }
-    public string? OutputFilePath { get; set; }
 
     public string SizeDisplay => ResultSize is null ? FileSize : $"{FileSize} → {ResultSize}";
 
