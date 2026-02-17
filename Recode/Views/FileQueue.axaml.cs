@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -25,6 +25,8 @@ public partial class FileQueue : UserControl
         InitializeComponent();
         AddHandler(DragDrop.DropEvent, OnDrop);
         AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
 
         if (Design.IsDesignMode)
         {
@@ -43,6 +45,49 @@ public partial class FileQueue : UserControl
                 },
             };
         }
+    }
+
+    void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is { } topLevel)
+            topLevel.AddHandler(KeyDownEvent, OnGlobalKeyDown, RoutingStrategies.Tunnel);
+    }
+
+    void OnUnloaded(object? sender, RoutedEventArgs e)
+    {
+        if (TopLevel.GetTopLevel(this) is { } topLevel)
+            topLevel.RemoveHandler(KeyDownEvent, OnGlobalKeyDown);
+    }
+
+    async void OnGlobalKeyDown(object? sender, KeyEventArgs e)
+    {
+        List<KeyGesture>? pasteGestures = Application.Current?.PlatformSettings?.HotkeyConfiguration.Paste;
+
+        if (pasteGestures?.Any(g => g.Matches(e)) != true)
+            return;
+
+        var topLevel = TopLevel.GetTopLevel(this);
+
+        if (topLevel?.Clipboard is not { } clipboard)
+            return;
+
+        using IAsyncDataTransfer? dataTransfer = await clipboard.TryGetDataAsync();
+
+        if (dataTransfer is null)
+            return;
+
+        IStorageItem[]? files = await dataTransfer.TryGetFilesAsync();
+
+        if (files is null)
+            return;
+
+        List<string> paths = files
+            .Select(f => f.Path.LocalPath)
+            .Where(p => VideoFiles.Extensions.Contains(Path.GetExtension(p).ToLowerInvariant()))
+            .ToList();
+
+        if (paths.Count > 0 && DataContext is MainWindowViewModel vm)
+            await vm.AddFilesWithHistoryCheckAsync(paths);
     }
 
     void OnDragOver(object? sender, DragEventArgs e)
