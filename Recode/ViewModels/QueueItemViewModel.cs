@@ -17,10 +17,10 @@ public partial class QueueItemViewModel : ViewModelBase
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
     string _fileSize;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry))]
+    [ObservableProperty]
     double _progress;
 
-    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry), nameof(ProgressBarBrush))]
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(CanRetry), nameof(CanCopy), nameof(ProgressBarBrush))]
     QueueItemStatus _status = QueueItemStatus.Pending;
 
     [ObservableProperty, NotifyPropertyChangedFor(nameof(SizeDisplay))]
@@ -50,10 +50,12 @@ public partial class QueueItemViewModel : ViewModelBase
 
     public string FilePath { get; }
     public string FileName { get; }
+    public string? OutputFilePath { get; set; }
 
     public string SizeDisplay => ResultSize is null ? FileSize : $"{FileSize} → {ResultSize}";
 
-    public bool CanRetry => Status is QueueItemStatus.Completed or QueueItemStatus.Failed;
+    public bool CanRetry => Status == QueueItemStatus.Failed;
+    public bool CanCopy => Status == QueueItemStatus.Completed && OutputFilePath != null;
 
     public IBrush ProgressBarBrush
     {

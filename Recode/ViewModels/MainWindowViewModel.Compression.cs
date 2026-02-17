@@ -60,6 +60,7 @@ public partial class MainWindowViewModel
                 {
                     item.Progress = 100;
                     item.ResultSize = Formatting.FormatFileSize(result.OutputSize);
+                    item.OutputFilePath = result.OutputPath;
                     item.Status = QueueItemStatus.Completed;
                     _historyService?.RecordCompressed(result.OutputPath);
                 }

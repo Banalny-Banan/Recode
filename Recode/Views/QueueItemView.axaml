@@ -30,12 +30,50 @@
         <Style Selector="Button:disabled /template/ ContentPresenter">
           <Setter Property="Background" Value="{DynamicResource AppBackgroundBrush}" />
         </Style>
+        <Style Selector="TextBlock.check-icon">
+          <Setter Property="Opacity" Value="0" />
+          <Setter Property="RenderTransform" Value="scale(0.7)" />
+        </Style>
+        <Style Selector="Button.copied TextBlock.copy-icon">
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="Button.copied TextBlock.check-icon">
+          <Setter Property="Opacity" Value="1" />
+          <Setter Property="RenderTransform" Value="scale(1)" />
+        </Style>
       </StackPanel.Styles>
 
-      <Button Content="&#xE72C;" FontFamily="Segoe Fluent Icons"
-              Width="28" Padding="0" FontSize="14" CornerRadius="4,0,0,4"
-              VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-              Command="{Binding RetryCommand}" IsEnabled="{Binding CanRetry}" ToolTip.Tip="Retry" />
+      <Grid Width="28" VerticalAlignment="Stretch">
+        <Button FontFamily="Segoe Fluent Icons"
+                Width="28" Padding="0" FontSize="14" CornerRadius="4,0,0,4"
+                VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                IsVisible="{Binding !CanRetry}" IsEnabled="{Binding CanCopy}"
+                Click="CopyButton_OnClick" ToolTip.Tip="Copy to clipboard">
+          <Grid>
+            <TextBlock Classes="copy-icon" Text="&#xE8C8;" HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TextBlock.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                </Transitions>
+              </TextBlock.Transitions>
+            </TextBlock>
+            <TextBlock Classes="check-icon" Text="&#xE73E;" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       RenderTransformOrigin="0.5,0.5">
+              <TextBlock.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                  <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+                </Transitions>
+              </TextBlock.Transitions>
+            </TextBlock>
+          </Grid>
+        </Button>
+        <Button Content="&#xE72C;" FontFamily="Segoe Fluent Icons"
+                Width="28" Padding="0" FontSize="14" CornerRadius="4,0,0,4"
+                VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                IsVisible="{Binding CanRetry}"
+                Command="{Binding RetryCommand}" ToolTip.Tip="Retry" />
+      </Grid>
 
       <Button Content="&#xE74D;" FontFamily="Segoe Fluent Icons"
               Width="28" Padding="0" FontSize="14" CornerRadius="0,4,4,0"
