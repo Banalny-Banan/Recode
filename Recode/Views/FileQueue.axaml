@@ -12,9 +12,18 @@
   <Grid RowDefinitions="*,Auto" RowSpacing="4">
 
     <Border BorderBrush="{DynamicResource AppBorderBrush}" Background="{DynamicResource AppInsetBrush}"
-            BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0" DragDrop.AllowDrop="True">
+            BorderThickness="1,1,1,1" CornerRadius="4,4,0,0" Padding="0,2" DragDrop.AllowDrop="True">
 
-      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="30" VerticalScrollBarVisibility="Hidden">
+      <controls:SmoothScrollViewer HorizontalScrollBarVisibility="Disabled" ScrollStep="50" Margin="0,0,2,0">
+
+        <controls:SmoothScrollViewer.Styles>
+          <Style Selector="RepeatButton">
+            <Setter Property="IsVisible" Value="False" />
+          </Style>
+          <Style Selector="Thumb">
+            <Setter Property="CornerRadius" Value="4" />
+          </Style>
+        </controls:SmoothScrollViewer.Styles>
 
         <DockPanel MinHeight="{Binding $parent[controls:SmoothScrollViewer].Viewport.Height}">
           <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding QueueItems}" Grid.IsSharedSizeScope="True">
