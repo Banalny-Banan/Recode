@@ -64,7 +64,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public bool StartButtonEnabled => FfMpegReady && (!string.IsNullOrEmpty(OutputPath) || ReplaceFiles);
 
-    public string OutputPathTooltip => string.IsNullOrEmpty(OutputPath) ? "Select output folder" : OutputPath;
+    public string OutputPathTooltip => string.IsNullOrEmpty(OutputPath) ? "Select output folder" : $"Output folder:\n{OutputPath}";
 
     public double OverallProgress => QueueItems.Count == 0 ? 0 : QueueItems.Average(item => item.Progress);
 
