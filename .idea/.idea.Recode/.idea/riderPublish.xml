@@ -5,6 +5,7 @@
       <list>
         <option value="$PROJECT_DIR$/Recode/bin/Release/net9.0/win-x64/publish" />
         <option value="$PROJECT_DIR$/Recode/bin/Release/net9.0/win-x64-dependent/publish" />
+        <option value="$PROJECT_DIR$/Recode/bin/Release/net9.0/win-x64-framework-dependent/publish" />
       </list>
     </option>
   </component>
