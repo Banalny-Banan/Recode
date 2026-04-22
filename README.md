@@ -2,8 +2,9 @@
 
 A simple, fast video compression utility for Windows.
 
-![Platform](https://img.shields.io/badge/platform-Windows-blue)
-![.NET](https://img.shields.io/badge/.NET-9.0-purple)
+![Platform](https://img.shields.io/badge/platform-Windows-blue?style=for-the-badge)
+![.NET](https://img.shields.io/badge/.NET-9.0-purple?style=for-the-badge)
+[![Downloads](https://img.shields.io/github/downloads/Banalny-Banan/Recode/total?label=Downloads&color=333333&style=for-the-badge)](https://github.com/Banalny-Banan/Recode/releases/latest)
 
 ## Features
 
