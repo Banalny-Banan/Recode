@@ -1,12 +1,11 @@
 using System.IO.Compression;
-using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.Ffmpeg;
 
 namespace Recode.Infrastructure.Services.FfMpeg;
 
 public class FfmpegManager : IFfmpegManager
 {
-    static readonly string FfmpegDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Recode");
+    static readonly string FfmpegDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Recode");
     
     public string FfmpegPath { get; } = Path.Combine(FfmpegDir, "ffmpeg.exe");
 

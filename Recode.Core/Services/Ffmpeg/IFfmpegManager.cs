@@ -1,4 +1,4 @@
-namespace Recode.Core.Services.FfmpegManager;
+namespace Recode.Core.Services.Ffmpeg;
 
 public interface IFfmpegManager
 {

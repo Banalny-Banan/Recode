@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 using CliWrap;
 using Recode.Core.Enums;
 using Recode.Core.Services.Ffmpeg;
-using Recode.Core.Services.FfmpegManager;
 
 namespace Recode.Infrastructure.Services.FfMpeg;
 

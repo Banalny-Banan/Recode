@@ -7,7 +7,6 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Recode.Core.Services.Compression;
 using Recode.Core.Services.Ffmpeg;
-using Recode.Core.Services.FfmpegManager;
 using Recode.Core.Services.History;
 using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;

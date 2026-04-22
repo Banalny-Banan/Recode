@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Recode.Core.Enums;
 using Recode.Core.Services.Compression;
-using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.Ffmpeg;
 using Recode.Core.Services.History;
 using Recode.Core.Services.Power;
 using Recode.Core.Services.Settings;

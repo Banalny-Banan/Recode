@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Recode.Core.Services.FfmpegManager;
+using Recode.Core.Services.Ffmpeg;
 
 namespace Recode.ViewModels;
 
