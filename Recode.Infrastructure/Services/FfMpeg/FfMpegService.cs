@@ -20,6 +20,9 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
         [],
     ];
 
+    // Keep only the last N stderr lines; enough to surface error context without unbounded growth
+    const int MaxStderrLines = 20;
+
     readonly string _ffmpegPath = ffmpegManager.FfmpegPath;
     HashSet<string>? _availableEncoders;
 
@@ -42,14 +45,17 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
                 return new FfMpegResult(false, "Could not determine file duration");
 
             var lastStderrLine = "";
-            List<string> stderrLines = [];
+            Queue<string> stderrLines = new();
 
             CommandResult result = await Cli.Wrap(_ffmpegPath)
                 .WithArguments(BuildArguments(inputPath, outputPath, options))
                 .WithStandardErrorPipe(PipeTarget.ToDelegate(line =>
                 {
                     lastStderrLine = line;
-                    stderrLines.Add(line);
+                    stderrLines.Enqueue(line);
+                    if (stderrLines.Count > MaxStderrLines)
+                        stderrLines.Dequeue();
+
                     TimeSpan? currentTime = ParseTime(line);
 
                     if (currentTime.HasValue)
@@ -60,8 +66,7 @@ public partial class FfMpegService(IFfmpegManager ffmpegManager) : IFfMpegServic
 
             if (result.ExitCode != 0)
             {
-                // Get the last few meaningful error lines
-                string errorMsg = string.Join("\n", stderrLines.TakeLast(10).Where(l => !string.IsNullOrWhiteSpace(l)));
+                string errorMsg = string.Join("\n", stderrLines.Where(l => !string.IsNullOrWhiteSpace(l)));
                 return new FfMpegResult(false, string.IsNullOrEmpty(errorMsg) ? lastStderrLine : errorMsg);
             }
 

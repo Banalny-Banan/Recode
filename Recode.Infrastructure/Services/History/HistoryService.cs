@@ -7,30 +7,39 @@ namespace Recode.Infrastructure.Services.History;
 public class HistoryService : IHistoryService
 {
     const int ChunkSize = 65536; // 64KB
-    static readonly string HistoryDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Recode");
+    static readonly string HistoryDir = AppPaths.AppDataDir;
     static readonly string HistoryFile = Path.Combine(HistoryDir, "history.json");
 
+    readonly SemaphoreSlim _lock = new(1, 1);
     readonly HashSet<string> _hashes;
 
-    public HistoryService() => _hashes = Load();
+    public HistoryService() => _hashes = LoadFromDisk();
 
-    public bool IsCompressed(string filePath)
+    public async Task<bool> IsCompressedAsync(string filePath)
     {
-        string hash = ComputeHash(filePath);
+        string hash = await ComputeHashAsync(filePath);
         return _hashes.Contains(hash);
     }
 
-    public void RecordCompressed(string filePath)
+    public async Task RecordCompressedAsync(string filePath)
     {
-        string hash = ComputeHash(filePath);
+        string hash = await ComputeHashAsync(filePath);
 
-        if (_hashes.Add(hash))
-            Save();
+        await _lock.WaitAsync();
+        try
+        {
+            if (_hashes.Add(hash))
+                await SaveAsync();
+        }
+        finally
+        {
+            _lock.Release();
+        }
     }
 
-    static string ComputeHash(string filePath)
+    static async Task<string> ComputeHashAsync(string filePath)
     {
-        using FileStream fs = File.OpenRead(filePath);
+        await using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, ChunkSize, useAsync: true);
         long fileSize = fs.Length;
 
         // Hash: file size + first 64KB + last 64KB
@@ -41,23 +50,22 @@ public class HistoryService : IHistoryService
         var buffer = new byte[ChunkSize];
 
         // First chunk
-        int firstRead = fs.Read(buffer, 0, ChunkSize);
+        int firstRead = await fs.ReadAsync(buffer);
         sha.TransformBlock(buffer, 0, firstRead, null, 0);
 
         // Last chunk (if file is large enough that it's different from the first)
         if (fileSize > ChunkSize)
         {
             fs.Seek(-ChunkSize, SeekOrigin.End);
-            int lastRead = fs.Read(buffer, 0, ChunkSize);
+            int lastRead = await fs.ReadAsync(buffer);
             sha.TransformBlock(buffer, 0, lastRead, null, 0);
         }
 
         sha.TransformFinalBlock([], 0, 0);
-        string result = Convert.ToHexString(sha.Hash!);
-        return result;
+        return Convert.ToHexString(sha.Hash!);
     }
 
-    HashSet<string> Load()
+    static HashSet<string> LoadFromDisk()
     {
         try
         {
@@ -73,10 +81,10 @@ public class HistoryService : IHistoryService
         }
     }
 
-    void Save()
+    async Task SaveAsync()
     {
         Directory.CreateDirectory(HistoryDir);
         string json = JsonSerializer.Serialize(_hashes);
-        File.WriteAllText(HistoryFile, json);
+        await File.WriteAllTextAsync(HistoryFile, json);
     }
 }

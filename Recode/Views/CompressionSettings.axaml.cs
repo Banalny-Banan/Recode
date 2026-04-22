@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -57,9 +56,9 @@ public partial class CompressionSettings : UserControl
                 Directory.Delete(DefaultOutputPath);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Debug.WriteLine($"Error picking output folder: {ex.Message}");
+            // Folder picker failure — nothing to surface to the user
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -88,9 +87,9 @@ public partial class FileQueue : UserControl
 
             await AddStorageItems(files);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Debug.WriteLine($"Error picking files: {ex.Message}");
+            // File picker failure — nothing to surface to the user
         }
     }
 
@@ -109,9 +108,9 @@ public partial class FileQueue : UserControl
 
             await AddStorageItems(files);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Debug.WriteLine($"Error handling dropped files: {ex.Message}");
+            // Drop handler failure — nothing to surface to the user
         }
     }
 
@@ -144,9 +143,9 @@ public partial class FileQueue : UserControl
 
             await AddStorageItems(files);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Debug.WriteLine($"Error handling paste: {ex.Message}");
+            // Paste handler failure — nothing to surface to the user
         }
     }
 

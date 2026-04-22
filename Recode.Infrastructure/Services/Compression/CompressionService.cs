@@ -41,7 +41,7 @@ public class CompressionService(IFfMpegService ffMpegService) : ICompressionServ
 
     static string TempPathFor(string filePath)
     {
-        string dir = Path.GetDirectoryName(filePath)!;
+        string dir = Path.GetDirectoryName(filePath) ?? Path.GetTempPath();
         string name = Path.GetFileNameWithoutExtension(filePath);
         string ext = Path.GetExtension(filePath);
         return Path.Combine(dir, $"{name}.temp{ext}");

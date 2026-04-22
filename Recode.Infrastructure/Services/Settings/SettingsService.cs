@@ -5,9 +5,7 @@ namespace Recode.Infrastructure.Services.Settings;
 
 public class SettingsService : ISettingsService
 {
-    static readonly string SettingsDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Recode");
-
+    static readonly string SettingsDir = AppPaths.AppDataDir;
     static readonly string SettingsFile = Path.Combine(SettingsDir, "settings.json");
 
     static readonly JsonSerializerOptions JsonOptions = new()

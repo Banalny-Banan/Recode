@@ -2,6 +2,6 @@ namespace Recode.Core.Services.History;
 
 public interface IHistoryService
 {
-    bool IsCompressed(string filePath);
-    void RecordCompressed(string filePath);
+    Task<bool> IsCompressedAsync(string filePath);
+    Task RecordCompressedAsync(string filePath);
 }

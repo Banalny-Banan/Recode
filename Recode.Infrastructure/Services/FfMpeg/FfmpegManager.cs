@@ -5,8 +5,10 @@ namespace Recode.Infrastructure.Services.FfMpeg;
 
 public class FfmpegManager : IFfmpegManager
 {
-    static readonly string FfmpegDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Recode");
-    
+    const int DownloadBufferSize = 81920; // 80KB
+
+    static readonly string FfmpegDir = AppPaths.LocalAppDataDir;
+
     public string FfmpegPath { get; } = Path.Combine(FfmpegDir, "ffmpeg.exe");
 
     public async Task<(bool Success, string? Message)> EnsureAvailableAsync(IProgress<double> progress, CancellationToken cancellationToken = default)
@@ -37,7 +39,7 @@ public class FfmpegManager : IFfmpegManager
             await using FileStream fileStream = File.Create(tempZip);
             await using Stream contentStream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-            var buffer = new byte[81920];
+            var buffer = new byte[DownloadBufferSize];
             int read;
 
             while ((read = await contentStream.ReadAsync(buffer, cancellationToken)) > 0)

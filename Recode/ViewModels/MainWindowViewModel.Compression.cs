@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,7 +61,9 @@ public partial class MainWindowViewModel
                     item.ResultSize = Formatting.FormatFileSize(result.OutputSize);
                     item.OutputFilePath = result.OutputPath;
                     item.Status = QueueItemStatus.Completed;
-                    _historyService?.RecordCompressed(result.OutputPath);
+
+                    if (_historyService != null)
+                        await _historyService.RecordCompressedAsync(result.OutputPath);
                 }
                 else if (_compressionCts.IsCancellationRequested)
                 {
@@ -74,7 +75,6 @@ public partial class MainWindowViewModel
                     item.Progress = 100;
                     item.Status = QueueItemStatus.Failed;
                     item.ErrorMessage = result.ErrorMessage;
-                    Debug.WriteLine($"Compression failed for {item.FilePath}: {result.ErrorMessage}");
                 }
 
                 OnPropertyChanged(nameof(OverallProgress));

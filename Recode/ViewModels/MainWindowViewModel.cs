@@ -70,8 +70,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public ObservableCollection<QueueItemViewModel> QueueItems { get; } = [];
 
-    public bool IsAlreadyCompressed(string filePath)
-        => _historyService?.IsCompressed(filePath) ?? false;
+    async Task<bool> IsAlreadyCompressedAsync(string filePath)
+        => _historyService != null && await _historyService.IsCompressedAsync(filePath);
 
     public void AddFiles(IEnumerable<string> filePaths)
     {
@@ -86,7 +86,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public async Task AddFilesWithHistoryCheckAsync(IList<string> filePaths)
     {
-        List<string> alreadyCompressed = filePaths.Where(IsAlreadyCompressed).ToList();
+        bool[] compressed = await Task.WhenAll(filePaths.Select(IsAlreadyCompressedAsync));
+        List<string> alreadyCompressed = filePaths.Where((_, i) => compressed[i]).ToList();
 
         if (alreadyCompressed.Count > 0)
         {
